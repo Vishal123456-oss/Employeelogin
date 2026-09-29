@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Employee Attendance System</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f2f5f9;
+    color:#172033;
+}
+
+/* HEADER */
+
+.header{
+    background:#172033;
+    color:white;
+    padding:18px;
+    text-align:center;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+}
+
+.header p{
+    margin:6px 0 0;
+    color:#bfc7d5;
+}
+
+/* LOGIN */
+
+.loginScreen{
+    min-height:calc(100vh - 80px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.loginBox{
+    width:100%;
+    max-width:420px;
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 10px 35px rgba(0,0,0,.12);
+}
+
+.loginBox h2{
+    margin-top:0;
+    text-align:center;
+}
+
+.loginBox p{
+    text-align:center;
+    color:#687386;
+}
+
+input,select{
+    width:100%;
+    padding:13px;
+    margin:7px 0;
+    border:1px solid #d7dce5;
+    border-radius:9px;
+    font-size:15px;
+    outline:none;
+}
+
+input:focus,select:focus{
+    border-color:#1565c0;
+}
+
+button{
+    border:0;
+    border-radius:9px;
+    padding:13px 16px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.primary{
+    width:100%;
+    background:#1565c0;
+    color:white;
+    margin-top:10px;
+}
+
+.secondary{
+    width:100%;
+    background:#edf1f7;
+    color:#172033;
+    margin-top:10px;
+}
+
+/* DASHBOARD */
+
+.dashboard{
+    display:none;
+    padding:20px;
+    max-width:1100px;
+    margin:auto;
+}
+
+.topBar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.topBar h2{
+    margin:0;
+}
+
+.logout{
+    background:#e53935;
+    color:white;
+}
+
+/* CARDS */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.07);
+}
+
+.cardTitle{
+    color:#687386;
+    font-size:14px;
+}
+
+.cardValue{
+    font-size:30px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+/* ATTENDANCE */
+
+.panel{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.07);
+    margin-bottom:20px;
+}
+
+.panel h3{
+    margin-top:0;
+}
+
+.employeeInfo{
+    background:#f4f7fb;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+.attendanceBtn{
+    background:#00a152;
+    color:white;
+    width:100%;
+    font-size:17px;
+}
+
+.attendanceBtn:disabled{
+    background:#9aa3ad;
+}
+
+/* TABLE */
+
+.tableWrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:650px;
+}
+
+th,td{
+    padding:12px;
+    border-bottom:1px solid #e5e8ed;
+    text-align:left;
+}
+
+th{
+    background:#f3f6fa;
+}
+
+.badge{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.pending{
+    background:#fff3cd;
+    color:#856404;
+}
+
+.approved{
+    background:#d4edda;
+    color:#155724;
+}
+
+.rejected{
+    background:#f8d7da;
+    color:#721c24;
+}
+
+.approveBtn{
+    background:#00a152;
+    color:white;
+    margin-right:5px;
+}
+
+.rejectBtn{
+    background:#e53935;
+    color:white;
+}
+
+/* ADMIN */
+
+.adminStats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+/* MESSAGE */
+
+.message{
+    padding:12px;
+    margin-top:12px;
+    border-radius:9px;
+    display:none;
+    text-align:center;
+}
+
+.success{
+    background:#d4edda;
+    color:#155724;
+}
+
+.error{
+    background:#f8d7da;
+    color:#721c24;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+    .cards,
+    .adminStats{
+        grid-template-columns:1fr;
+    }
+
+    .topBar{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .topBar h2{
+        text-align:center;
+    }
+
+    .logout{
+        width:100%;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <div class="logo">
+        📋 Employee Attendance System
+    </div>
+
+    <p>
+        Employee Attendance & Admin Approval
+    </p>
+
+</div>
+
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginScreen" class="loginScreen">
+
+    <div class="loginBox">
+
+        <h2>🔐 Login</h2>
+
+        <p>
+            Select login type
+        </p>
+
+        <select id="loginType">
+
+            <option value="employee">
+                Employee Login
+            </option>
+
+            <option value="admin">
+                Admin Login
+            </option>
+
+        </select>
+
+
+        <!-- EMPLOYEE -->
+
+        <div id="employeeLogin">
+
+            <input
+                id="employeeId"
+                type="text"
+                placeholder="Employee ID e.g. EMP001"
+                autocomplete="off"
+            >
+
+            <input
+                id="employeeName"
+                type="text"
+                placeholder="Employee Name"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- ADMIN -->
+
+        <div
+            id="adminLogin"
+            style="display:none;"
+        >
+
+            <input
+                id="adminUsername"
+                type="text"
+                placeholder="Admin Username"
+                autocomplete="off"
+            >
+
+            <input
+                id="adminPassword"
+                type="password"
+                placeholder="Admin Password"
+            >
+
+        </div>
+
+
+        <button
+            class="primary"
+            id="loginBtn"
+        >
+            LOGIN
+        </button>
+
+
+        <div
+            id="loginMessage"
+            class="message"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= EMPLOYEE DASHBOARD ================= -->
+
+<div
+    id="employeeDashboard"
+    class="dashboard"
+>
+
+    <div class="topBar">
+
+        <h2>
+            👤 Employee Dashboard
+        </h2>
+
+        <button
+            class="logout"
+            onclick="logout()"
+        >
+            LOGOUT
+        </button>
+
+    </div>
+
+
+    <div class="cards">
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Employee ID
+            </div>
+
+            <div
+                class="cardValue"
+                id="empIdDisplay"
+                style="font-size:22px;"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Present Days
+            </div>
+
+            <div
+                class="cardValue"
+                id="presentDays"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Pending
+            </div>
+
+            <div
+                class="cardValue"
+                id="pendingDays"
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MARK ATTENDANCE -->
+
+    <div class="panel">
+
+        <h3>
+            📝 Mark Today's Attendance
+        </h3>
+
+        <div class="employeeInfo">
+
+            <b id="employeeWelcome">
+                Employee
+            </b>
+
+            <br>
+
+            <span id="currentDateTime">
+                -
+            </span>
+
+        </div>
+
+
+        <button
+            id="markAttendanceBtn"
+            class="attendanceBtn"
+        >
+            ✅ MARK ATTENDANCE
+        </button>
+
+
+        <div
+            id="employeeMessage"
+            class="message"
+        ></div>
+
+    </div>
+
+
+    <!-- EMPLOYEE HISTORY -->
+
+    <div class="panel">
+
+        <h3>
+            📊 My Attendance History
+        </h3>
+
+        <div class="tableWrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody
+                    id="employeeHistory"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= ADMIN DASHBOARD ================= -->
+
+<div
+    id="adminDashboard"
+    class="dashboard"
+>
+
+    <div class="topBar">
+
+        <h2>
+            🛠️ Admin Dashboard
+        </h2>
+
+        <button
+            class="logout"
+            onclick="logout()"
+        >
+            LOGOUT
+        </button>
+
+    </div>
+
+
+    <div class="adminStats">
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Total Requests
+            </div>
+
+            <div
+                id="totalRequests"
+                class="cardValue"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Pending
+            </div>
+
+            <div
+                id="totalPending"
+                class="cardValue"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Approved
+            </div>
+
+            <div
+                id="totalApproved"
+                class="cardValue"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="cardTitle">
+                Rejected
+            </div>
+
+            <div
+                id="totalRejected"
+                class="cardValue"
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADMIN TABLE -->
+
+    <div class="panel">
+
+        <h3>
+            📋 Attendance Requests
+        </h3>
+
+        <div class="tableWrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody
+                    id="adminTable"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h3>
+            👥 Employee Summary
+        </h3>
+
+        <div class="tableWrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Approved Days</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody
+                    id="employeeSummary"
+                ></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   STORAGE
+========================================= */
+
+const STORAGE_KEY =
+    "employee_attendance_records_v1";
+
+
+function getRecords(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(
+                STORAGE_KEY
+            )
+        ) || [];
+
+    }catch(error){
+
+        return [];
+
+    }
+
+}
+
+
+function saveRecords(records){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(records)
+    );
+
+}
+
+
+/* =========================================
+   LOGIN TYPE
+========================================= */
+
+const loginType =
+    document.getElementById(
+        "loginType"
+    );
+
+
+loginType.addEventListener(
+    "change",
+    function(){
+
+        const type =
+            this.value;
+
+
+        document.getElementById(
+            "employeeLogin"
+        ).style.display =
+            type === "employee"
+            ? "block"
+            : "none";
+
+
+        document.getElementById(
+            "adminLogin"
+        ).style.display =
+            type === "admin"
+            ? "block"
+            : "none";
+
+    }
+);
+
+
+/* =========================================
+   LOGIN
+========================================= */
+
+document.getElementById(
+    "loginBtn"
+).addEventListener(
+    "click",
+    login
+);
+
+
+function login(){
+
+    const type =
+        loginType.value;
+
+
+    clearMessage(
+        "loginMessage"
+    );
+
+
+    /* EMPLOYEE LOGIN */
+
+    if(type === "employee"){
+
+        const id =
+            document
+            .getElementById(
+                "employeeId"
+            )
+            .value
+            .trim()
+            .toUpperCase();
+
+
+        const name =
+            document
+            .getElementById(
+                "employeeName"
+            )
+            .value
+            .trim();
+
+
+        if(!id || !name){
+
+            showMessage(
+                "loginMessage",
+                "Please enter Employee ID and Name.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        sessionStorage.setItem(
+            "loginRole",
+            "employee"
+        );
+
+        sessionStorage.setItem(
+            "employeeId",
+            id
+        );
+
+        sessionStorage.setItem(
+            "employeeName",
+            name
+        );
+
+
+        showEmployeeDashboard();
+
+        return;
+
+    }
+
+
+    /* ADMIN LOGIN */
+
+    const username =
+        document
+        .getElementById(
+            "adminUsername"
+        )
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById(
+            "adminPassword"
+        )
+        .value;
+
+
+    /*
+      PROTOTYPE LOGIN
+      Username: ADMIN
+      Password: 1234
+    */
+
+    if(
+        username === "ADMIN" &&
+        password === "1234"
+    ){
+
+        sessionStorage.setItem(
+            "loginRole",
+            "admin"
+        );
+
+
+        showAdminDashboard();
+
+
+    }else{
+
+        showMessage(
+            "loginMessage",
+            "Invalid admin username or password.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   EMPLOYEE DASHBOARD
+========================================= */
+
+function showEmployeeDashboard(){
+
+    document.getElementById(
+        "loginScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "adminDashboard"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "employeeDashboard"
+    ).style.display =
+        "block";
+
+
+    const id =
+        sessionStorage.getItem(
+            "employeeId"
+        );
+
+
+    const name =
+        sessionStorage.getItem(
+            "employeeName"
+        );
+
+
+    document.getElementById(
+        "empIdDisplay"
+    ).textContent =
+        id;
+
+
+    document.getElementById(
+        "employeeWelcome"
+    ).textContent =
+        "Welcome, " + name;
+
+
+    updateDateTime();
+
+    renderEmployeeData();
+
+}
+
+
+/* =========================================
+   CURRENT DATE/TIME
+========================================= */
+
+function updateDateTime(){
+
+    const now =
+        new Date();
+
+
+    const text =
+        now.toLocaleDateString(
+            "en-IN"
+        ) +
+        " " +
+        now.toLocaleTimeString(
+            "en-IN"
+        );
+
+
+    document.getElementById(
+        "currentDateTime"
+    ).textContent =
+        text;
+
+}
+
+
+setInterval(
+    updateDateTime,
+    1000
+);
+
+
+/* =========================================
+   MARK ATTENDANCE
+========================================= */
+
+document.getElementById(
+    "markAttendanceBtn"
+).addEventListener(
+    "click",
+    markAttendance
+);
+
+
+function markAttendance(){
+
+    const employeeId =
+        sessionStorage.getItem(
+            "employeeId"
+        );
+
+
+    const employeeName =
+        sessionStorage.getItem(
+            "employeeName"
+        );
+
+
+    if(!employeeId){
+
+        return;
+
+    }
+
+
+    const records =
+        getRecords();
+
+
+    const now =
+        new Date();
+
+
+    const date =
+        now.toLocaleDateString(
+            "en-IN"
+        );
+
+
+    /*
+      Prevent duplicate attendance
+      for same employee on same date.
+    */
+
+    const alreadyMarked =
+        records.some(
+            function(record){
+
+                return (
+                    record.employeeId ===
+                    employeeId
+                    &&
+                    record.date ===
+                    date
+                );
+
+            }
+        );
+
+
+    if(alreadyMarked){
+
+        showMessage(
+            "employeeMessage",
+            "Attendance has already been submitted today.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const newRecord = {
+
+        id:
+            Date.now(),
+
+        employeeId:
+            employeeId,
+
+        employeeName:
+            employeeName,
+
+        date:
+            date,
+
+        time:
+            now.toLocaleTimeString(
+                "en-IN"
+            ),
+
+        status:
+            "Pending"
+
+    };
+
+
+    records.push(
+        newRecord
+    );
+
+
+    saveRecords(
+        records
+    );
+
+
+    showMessage(
+        "employeeMessage",
+        "Attendance submitted. Waiting for admin approval.",
+        "success"
+    );
+
+
+    renderEmployeeData();
+
+}
+
+
+/* =========================================
+   EMPLOYEE DATA
+========================================= */
+
+function renderEmployeeData(){
+
+    const employeeId =
+        sessionStorage.getItem(
+            "employeeId"
+        );
+
+
+    const records =
+        getRecords();
+
+
+    const myRecords =
+        records.filter(
+            function(record){
+
+                return (
+                    record.employeeId ===
+                    employeeId
+                );
+
+            }
+        );
+
+
+    const approved =
+        myRecords.filter(
+            function(record){
+
+                return record.status ===
+                    "Approved";
+
+            }
+        ).length;
+
+
+    const pending =
+        myRecords.filter(
+            function(record){
+
+                return record.status ===
+                    "Pending";
+
+            }
+        ).length;
+
+
+    document.getElementById(
+        "presentDays"
+    ).textContent =
+        approved;
+
+
+    document.getElementById(
+        "pendingDays"
+    ).textContent =
+        pending;
+
+
+    const tbody =
+        document.getElementById(
+            "employeeHistory"
+        );
+
+
+    tbody.innerHTML = "";
+
+
+    if(myRecords.length === 0){
+
+        tbody.innerHTML =
+            `
+            <tr>
+                <td colspan="3">
+                    No attendance records yet.
+                </td>
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    myRecords
+        .slice()
+        .reverse()
+        .forEach(
+            function(record){
+
+                const tr =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                tr.innerHTML =
+                    `
+                    <td>${record.date}</td>
+
+                    <td>${record.time}</td>
+
+                    <td>
+                        ${statusBadge(record.status)}
+                    </td>
+                    `;
+
+
+                tbody.appendChild(
+                    tr
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   ADMIN DASHBOARD
+========================================= */
+
+function showAdminDashboard(){
+
+    document.getElementById(
+        "loginScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "employeeDashboard"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "adminDashboard"
+    ).style.display =
+        "block";
+
+
+    renderAdmin();
+
+}
+
+
+/* =========================================
+   ADMIN RENDER
+========================================= */
+
+function renderAdmin(){
+
+    const records =
+        getRecords();
+
+
+    const pending =
+        records.filter(
+            r =>
+                r.status ===
+                "Pending"
+        ).length;
+
+
+    const approved =
+        records.filter(
+            r =>
+                r.status ===
+                "Approved"
+        ).length;
+
+
+    const rejected =
+        records.filter(
+            r =>
+                r.status ===
+                "Rejected"
+        ).length;
+
+
+    document.getElementById(
+        "totalRe

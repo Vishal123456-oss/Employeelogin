@@ -693,5 +693,14 @@ if(role==="admin")showAdminDashboard();
 
 });
 </script>
+  window.onerror = function(message, source, line, column, error) {
+    alert(
+        "JAVASCRIPT ERROR\n\n" +
+        message +
+        "\n\nLine: " +
+        line
+    );
+    return false;
+};
 </body>
 </html>

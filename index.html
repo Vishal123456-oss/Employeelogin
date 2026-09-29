@@ -2,242 +2,50 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Employee Attendance System</title>
 
 <style>
 *{box-sizing:border-box}
-
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f2f5f9;
-    color:#172033;
-}
-
-.header{
-    background:#172033;
-    color:white;
-    padding:20px;
-    text-align:center;
-}
-
-.logo{
-    font-size:25px;
-    font-weight:bold;
-}
-
-.header p{
-    margin:6px 0 0;
-    color:#c7ced9;
-}
-
-.loginScreen{
-    min-height:calc(100vh - 90px);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-.loginBox{
-    width:100%;
-    max-width:420px;
-    background:white;
-    padding:30px;
-    border-radius:18px;
-    box-shadow:0 8px 30px rgba(0,0,0,.12);
-}
-
-.loginBox h2{
-    text-align:center;
-    margin-top:0;
-}
-
-.loginBox p{
-    text-align:center;
-    color:#687386;
-}
-
-input,select{
-    width:100%;
-    padding:13px;
-    margin:7px 0;
-    border:1px solid #d7dce5;
-    border-radius:9px;
-    font-size:15px;
-}
-
-button{
-    border:0;
-    border-radius:9px;
-    padding:13px 16px;
-    font-size:15px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.primary{
-    width:100%;
-    background:#1565c0;
-    color:white;
-    margin-top:10px;
-}
-
-.dashboard{
-    display:none;
-    max-width:1100px;
-    margin:auto;
-    padding:20px;
-}
-
-.topBar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-
-.logout{
-    background:#e53935;
-    color:white;
-}
-
-.cards{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:15px;
-    margin-bottom:20px;
-}
-
-.adminStats{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:15px;
-    margin-bottom:20px;
-}
-
-.card,.panel{
-    background:white;
-    border-radius:15px;
-    padding:20px;
-    box-shadow:0 5px 20px rgba(0,0,0,.07);
-}
-
-.cardTitle{
-    color:#687386;
-    font-size:14px;
-}
-
-.cardValue{
-    font-size:30px;
-    font-weight:bold;
-    margin-top:8px;
-}
-
-.panel{
-    margin-bottom:20px;
-}
-
-.employeeInfo{
-    background:#f4f7fb;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:15px;
-}
-
-.attendanceBtn{
-    width:100%;
-    background:#00a152;
-    color:white;
-    font-size:17px;
-}
-
-.tableWrap{
-    overflow-x:auto;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:650px;
-}
-
-th,td{
-    padding:12px;
-    border-bottom:1px solid #e5e8ed;
-    text-align:left;
-}
-
-th{
-    background:#f3f6fa;
-}
-
-.badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:12px;
-    font-weight:bold;
-}
-
-.pending{
-    background:#fff3cd;
-    color:#856404;
-}
-
-.approved{
-    background:#d4edda;
-    color:#155724;
-}
-
-.rejected{
-    background:#f8d7da;
-    color:#721c24;
-}
-
-.approveBtn{
-    background:#00a152;
-    color:white;
-    margin-right:5px;
-}
-
-.rejectBtn{
-    background:#e53935;
-    color:white;
-}
-
-.message{
-    display:none;
-    padding:12px;
-    margin-top:12px;
-    border-radius:9px;
-    text-align:center;
-}
-
-.success{
-    background:#d4edda;
-    color:#155724;
-}
-
-.error{
-    background:#f8d7da;
-    color:#721c24;
-}
-
+body{margin:0;font-family:Arial;background:#f2f5f9;color:#172033}
+.header{background:#172033;color:white;text-align:center;padding:20px}
+.logo{font-size:25px;font-weight:bold}
+.header p{margin:6px 0;color:#c7ced9}
+.loginScreen{min-height:calc(100vh - 90px);display:flex;align-items:center;justify-content:center;padding:20px}
+.loginBox{background:white;width:100%;max-width:420px;padding:30px;border-radius:18px;box-shadow:0 8px 30px #0002}
+h2{text-align:center}
+input,select{width:100%;padding:13px;margin:7px 0;border:1px solid #d7dce5;border-radius:9px;font-size:15px}
+button{border:0;border-radius:9px;padding:12px 15px;font-weight:bold;cursor:pointer}
+.primary{width:100%;background:#1565c0;color:white;margin-top:10px}
+.dashboard{display:none;max-width:1150px;margin:auto;padding:20px}
+.topBar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.logout{background:#e53935;color:white}
+.cards,.adminStats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:20px}
+.adminStats{grid-template-columns:repeat(4,1fr)}
+.card,.panel{background:white;padding:20px;border-radius:15px;box-shadow:0 5px 20px #0001;margin-bottom:20px}
+.cardTitle{color:#687386;font-size:14px}
+.cardValue{font-size:28px;font-weight:bold;margin-top:8px}
+.employeeInfo{background:#f4f7fb;padding:15px;border-radius:10px;margin-bottom:15px}
+.attendanceBtn{width:100%;background:#00a152;color:white;font-size:17px}
+.tableWrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th,td{padding:11px;border-bottom:1px solid #e5e8ed;text-align:left}
+th{background:#f3f6fa}
+.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold}
+.pending{background:#fff3cd;color:#856404}
+.approved{background:#d4edda;color:#155724}
+.rejected{background:#f8d7da;color:#721c24}
+.approveBtn{background:#00a152;color:white;margin-right:5px}
+.rejectBtn{background:#e53935;color:white}
+.adminMarkBtn{background:#1565c0;color:white}
+.message{display:none;padding:12px;margin-top:12px;border-radius:9px;text-align:center}
+.success{background:#d4edda;color:#155724}
+.error{background:#f8d7da;color:#721c24}
+.small{font-size:13px;color:#687386}
 @media(max-width:700px){
-    .cards,.adminStats{
-        grid-template-columns:1fr;
-    }
-
-    .topBar{
-        flex-direction:column;
-        gap:12px;
-    }
-
-    .logout{
-        width:100%;
-    }
+.cards,.adminStats{grid-template-columns:1fr}
+.topBar{flex-direction:column;gap:10px}
+.logout{width:100%}
 }
 </style>
 </head>
@@ -245,93 +53,46 @@ th{
 <body>
 
 <div class="header">
-    <div class="logo">📋 Employee Attendance System</div>
-    <p>Employee Attendance & Admin Approval</p>
+<div class="logo">📋 Employee Attendance System</div>
+<p>Employee Attendance & Admin Approval</p>
 </div>
 
-
 <!-- LOGIN -->
-
 <div id="loginScreen" class="loginScreen">
-
 <div class="loginBox">
 
 <h2>🔐 Login</h2>
-
 <p>Select login type</p>
 
 <select id="loginType">
-    <option value="employee">Employee Login</option>
-    <option value="admin">Admin Login</option>
+<option value="employee">Employee Login</option>
+<option value="admin">Admin Login</option>
 </select>
 
-
 <div id="employeeLogin">
-
-<input
-    id="employeeId"
-    type="text"
-    placeholder="Employee ID e.g. EMP001"
->
-
-<input
-    id="employeeName"
-    type="text"
-    placeholder="Employee Name"
->
-
+<input id="employeeId" placeholder="Employee ID e.g. EMP001">
+<input id="employeePassword" type="password" placeholder="Password">
 </div>
-
 
 <div id="adminLogin" style="display:none">
-
-<input
-    id="adminUsername"
-    type="text"
-    placeholder="Admin Username"
->
-
-<input
-    id="adminPassword"
-    type="password"
-    placeholder="Admin Password"
->
-
+<input id="adminUsername" placeholder="Admin Username">
+<input id="adminPassword" type="password" placeholder="Admin Password">
 </div>
 
-
-<button
-    id="loginBtn"
-    class="primary"
-    type="button"
->
-LOGIN
-</button>
-
+<button id="loginBtn" class="primary">LOGIN</button>
 <div id="loginMessage" class="message"></div>
 
 </div>
 </div>
 
 
-<!-- EMPLOYEE DASHBOARD -->
-
+<!-- EMPLOYEE -->
 <div id="employeeDashboard" class="dashboard">
 
 <div class="topBar">
-
 <h2>👤 Employee Dashboard</h2>
-
-<button
-    class="logout"
-    type="button"
-    onclick="logout()"
->
-LOGOUT
-</button>
-
+<button class="logout" onclick="logout()">LOGOUT</button>
 </div>
-
 
 <div class="cards">
 
@@ -339,6 +100,20 @@ LOGOUT
 <div class="cardTitle">Employee ID</div>
 <div id="empIdDisplay" class="cardValue">-</div>
 </div>
+
+<div class="card">
+<div class="cardTitle">Per Day Wage</div>
+<div id="empDailyWage" class="cardValue">₹0</div>
+</div>
+
+<div class="card">
+<div class="cardTitle">Monthly Wage</div>
+<div id="empMonthlyWage" class="cardValue">₹0</div>
+</div>
+
+</div>
+
+<div class="cards">
 
 <div class="card">
 <div class="cardTitle">Approved Days</div>
@@ -350,28 +125,23 @@ LOGOUT
 <div id="pendingDays" class="cardValue">0</div>
 </div>
 
+<div class="card">
+<div class="cardTitle">Employee</div>
+<div id="employeeNameDisplay" class="cardValue" style="font-size:20px">-</div>
 </div>
 
+</div>
 
 <div class="panel">
 
 <h3>📝 Today's Attendance</h3>
 
 <div class="employeeInfo">
-
-<b id="employeeWelcome">Employee</b>
-
-<br>
-
+<b id="employeeWelcome">Employee</b><br>
 <span id="currentDateTime"></span>
-
 </div>
 
-<button
-    id="markAttendanceBtn"
-    class="attendanceBtn"
-    type="button"
->
+<button id="markAttendanceBtn" class="attendanceBtn">
 ✅ MARK ATTENDANCE
 </button>
 
@@ -379,52 +149,35 @@ LOGOUT
 
 </div>
 
-
 <div class="panel">
 
 <h3>📊 My Attendance History</h3>
 
 <div class="tableWrap">
-
 <table>
-
 <thead>
 <tr>
 <th>Date</th>
 <th>Time</th>
+<th>Marked By</th>
 <th>Status</th>
 </tr>
 </thead>
-
 <tbody id="employeeHistory"></tbody>
-
 </table>
-
 </div>
 
 </div>
-
 </div>
 
 
-<!-- ADMIN DASHBOARD -->
-
+<!-- ADMIN -->
 <div id="adminDashboard" class="dashboard">
 
 <div class="topBar">
-
 <h2>🛠️ Admin Dashboard</h2>
-
-<button
-    class="logout"
-    type="button"
-    onclick="logout()"
->
-LOGOUT
-</button>
-
+<button class="logout" onclick="logout()">LOGOUT</button>
 </div>
-
 
 <div class="adminStats">
 
@@ -451,6 +204,30 @@ LOGOUT
 </div>
 
 
+<!-- ADMIN MARK -->
+<div class="panel">
+
+<h3>➕ Admin Mark Attendance</h3>
+
+<p class="small">
+Use this when an employee did not mark attendance.
+Admin-marked attendance is automatically Approved.
+</p>
+
+<select id="adminEmployee"></select>
+
+<input id="adminDate" type="date">
+
+<button class="adminMarkBtn" onclick="adminMarkAttendance()">
+MARK ATTENDANCE BY ADMIN
+</button>
+
+<div id="adminMarkMessage" class="message"></div>
+
+</div>
+
+
+<!-- REQUESTS -->
 <div class="panel">
 
 <h3>📋 Attendance Requests</h3>
@@ -458,18 +235,16 @@ LOGOUT
 <div class="tableWrap">
 
 <table>
-
 <thead>
-
 <tr>
 <th>Employee ID</th>
 <th>Name</th>
 <th>Date</th>
 <th>Time</th>
+<th>Marked By</th>
 <th>Status</th>
 <th>Action</th>
 </tr>
-
 </thead>
 
 <tbody id="adminTable"></tbody>
@@ -477,10 +252,10 @@ LOGOUT
 </table>
 
 </div>
-
 </div>
 
 
+<!-- SUMMARY -->
 <div class="panel">
 
 <h3>👥 Employee Summary</h3>
@@ -488,15 +263,14 @@ LOGOUT
 <div class="tableWrap">
 
 <table>
-
 <thead>
-
 <tr>
-<th>Employee ID</th>
+<th>ID</th>
 <th>Name</th>
+<th>Per Day</th>
 <th>Approved Days</th>
+<th>Monthly Wage</th>
 </tr>
-
 </thead>
 
 <tbody id="employeeSummary"></tbody>
@@ -504,7 +278,6 @@ LOGOUT
 </table>
 
 </div>
-
 </div>
 
 </div>
@@ -512,851 +285,1000 @@ LOGOUT
 
 <script>
 
-/* ================================
+/* =====================================
+   EMPLOYEES
+===================================== */
+
+const employees = [
+
+{
+id:"EMP001",
+name:"VICKRAM",
+password:"Vick@001",
+wage:600
+},
+
+{
+id:"EMP002",
+name:"VISHU",
+password:"Vish@002",
+wage:600
+},
+
+{
+id:"EMP003",
+name:"GURDEEP",
+password:"Gurd@003",
+wage:520
+},
+
+{
+id:"EMP004",
+name:"SAHIL",
+password:"Sahil@004",
+wage:550
+},
+
+{
+id:"EMP005",
+name:"VICKY",
+password:"Vicky@005",
+wage:550
+},
+
+{
+id:"EMP006",
+name:"AMAN",
+password:"Aman@006",
+wage:500
+},
+
+{
+id:"EMP007",
+name:"GIRDHARI",
+password:"Gird@007",
+wage:470
+},
+
+{
+id:"EMP008",
+name:"UTTAM",
+password:"Uttam@008",
+wage:450
+},
+
+{
+id:"EMP009",
+name:"RAHUL",
+password:"Rahul@009",
+wage:700
+},
+
+{
+id:"EMP010",
+name:"OM PRAKASH",
+password:"Om@010",
+wage:450
+},
+
+{
+id:"EMP011",
+name:"VARUN",
+password:"Varun@011",
+wage:450
+},
+
+{
+id:"EMP012",
+name:"GOKUL",
+password:"Goku@012",
+wage:460
+},
+
+{
+id:"EMP013",
+name:"RAKESH SINGH",
+password:"Rakesh@013",
+wage:430
+},
+
+{
+id:"EMP014",
+name:"RAKESH SHARMA",
+password:"RakeshS@014",
+wage:480
+},
+
+{
+id:"EMP015",
+name:"SUDESH SINGH",
+password:"Sudesh@015",
+wage:450
+}
+
+];
+
+
+/* =====================================
    STORAGE
-================================ */
+===================================== */
 
 const STORAGE_KEY =
-"employee_attendance_records_v1";
-
+"employee_attendance_records_v2";
 
 function getRecords(){
 
-    try{
-
-        return JSON.parse(
-            localStorage.getItem(STORAGE_KEY)
-        ) || [];
-
-    }catch(error){
-
-        return [];
-
-    }
+try{
+return JSON.parse(
+localStorage.getItem(STORAGE_KEY)
+)||[];
+}catch(e){
+return[];
 }
 
+}
 
 function saveRecords(records){
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(records)
-    );
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(records)
+);
 
 }
 
 
-/* ================================
+/* =====================================
    LOGIN TYPE
-================================ */
+===================================== */
 
-document
-.getElementById("loginType")
+document.getElementById("loginType")
 .addEventListener("change",function(){
 
-    const type=this.value;
+const employee =
+document.getElementById("employeeLogin");
 
-    document.getElementById(
-        "employeeLogin"
-    ).style.display =
-        type==="employee"
-        ? "block"
-        : "none";
+const admin =
+document.getElementById("adminLogin");
 
-    document.getElementById(
-        "adminLogin"
-    ).style.display =
-        type==="admin"
-        ? "block"
-        : "none";
+if(this.value==="employee"){
+
+employee.style.display="block";
+admin.style.display="none";
+
+}else{
+
+employee.style.display="none";
+admin.style.display="block";
+
+}
 
 });
 
 
-/* ================================
-   LOGIN BUTTON
-================================ */
+/* =====================================
+   LOGIN
+===================================== */
 
-document
-.getElementById("loginBtn")
+document.getElementById("loginBtn")
 .addEventListener("click",login);
 
 
 function login(){
 
-    const type =
-        document.getElementById(
-            "loginType"
-        ).value;
+clearMessage("loginMessage");
+
+const type =
+document.getElementById("loginType").value;
 
 
-    clearMessage("loginMessage");
+/* EMPLOYEE */
+
+if(type==="employee"){
+
+const id =
+document.getElementById("employeeId")
+.value.trim().toUpperCase();
+
+const password =
+document.getElementById("employeePassword")
+.value;
 
 
-    /* EMPLOYEE LOGIN */
+const employee =
+employees.find(function(e){
 
-    if(type==="employee"){
+return e.id===id &&
+e.password===password;
 
-        const id =
-            document
-            .getElementById("employeeId")
-            .value
-            .trim()
-            .toUpperCase();
-
-        const name =
-            document
-            .getElementById("employeeName")
-            .value
-            .trim();
+});
 
 
-        if(id==="" || name===""){
+if(!employee){
 
-            showMessage(
-                "loginMessage",
-                "Please enter Employee ID and Name.",
-                "error"
-            );
+showMessage(
+"loginMessage",
+"Invalid Employee ID or Password.",
+"error"
+);
 
-            return;
-        }
-
-
-        sessionStorage.setItem(
-            "loginRole",
-            "employee"
-        );
-
-        sessionStorage.setItem(
-            "employeeId",
-            id
-        );
-
-        sessionStorage.setItem(
-            "employeeName",
-            name
-        );
+return;
+}
 
 
-        showEmployeeDashboard();
+sessionStorage.setItem(
+"loginRole","employee"
+);
 
-        return;
-    }
+sessionStorage.setItem(
+"employeeId",
+employee.id
+);
 
-
-    /* ADMIN LOGIN */
-
-    const username =
-        document
-        .getElementById("adminUsername")
-        .value
-        .trim()
-        .toUpperCase();
-
-    const password =
-        document
-        .getElementById("adminPassword")
-        .value;
+sessionStorage.setItem(
+"employeeName",
+employee.name
+);
 
 
-    if(
-        username==="ADMIN" &&
-        password==="1234"
-    ){
+showEmployeeDashboard();
 
-        sessionStorage.setItem(
-            "loginRole",
-            "admin"
-        );
-
-        showAdminDashboard();
-
-    }else{
-
-        showMessage(
-            "loginMessage",
-            "Invalid admin username or password.",
-            "error"
-        );
-
-    }
+return;
 
 }
 
 
-/* ================================
+/* ADMIN */
+
+const username =
+document.getElementById("adminUsername")
+.value.trim().toUpperCase();
+
+const password =
+document.getElementById("adminPassword")
+.value;
+
+
+if(
+username==="ADMIN" &&
+password==="1234"
+){
+
+sessionStorage.setItem(
+"loginRole","admin"
+);
+
+showAdminDashboard();
+
+}else{
+
+showMessage(
+"loginMessage",
+"Invalid admin username or password.",
+"error"
+);
+
+}
+
+}
+
+
+/* =====================================
    EMPLOYEE DASHBOARD
-================================ */
+===================================== */
 
 function showEmployeeDashboard(){
 
-    document.getElementById(
-        "loginScreen"
-    ).style.display="none";
+document.getElementById("loginScreen")
+.style.display="none";
 
-    document.getElementById(
-        "adminDashboard"
-    ).style.display="none";
+document.getElementById("adminDashboard")
+.style.display="none";
 
-    document.getElementById(
-        "employeeDashboard"
-    ).style.display="block";
+document.getElementById("employeeDashboard")
+.style.display="block";
 
 
-    const id =
-        sessionStorage.getItem(
-            "employeeId"
-        );
+const id =
+sessionStorage.getItem("employeeId");
 
-    const name =
-        sessionStorage.getItem(
-            "employeeName"
-        );
+const employee =
+employees.find(e=>e.id===id);
 
 
-    document.getElementById(
-        "empIdDisplay"
-    ).textContent=id;
+document.getElementById(
+"empIdDisplay"
+).textContent=id;
 
-    document.getElementById(
-        "employeeWelcome"
-    ).textContent=
-        "Welcome, "+name;
+document.getElementById(
+"employeeNameDisplay"
+).textContent=employee.name;
+
+document.getElementById(
+"employeeWelcome"
+).textContent=
+"Welcome, "+employee.name;
+
+document.getElementById(
+"empDailyWage"
+).textContent=
+"₹"+employee.wage;
 
 
-    updateDateTime();
-
-    renderEmployeeData();
+updateDateTime();
+renderEmployeeData();
 
 }
 
 
-/* ================================
+/* =====================================
    CLOCK
-================================ */
+===================================== */
 
 function updateDateTime(){
 
-    const now=new Date();
+const now=new Date();
 
-    document.getElementById(
-        "currentDateTime"
-    ).textContent =
-        now.toLocaleDateString("en-IN")
-        +" "
-        +
-        now.toLocaleTimeString("en-IN");
+document.getElementById(
+"currentDateTime"
+).textContent=
+now.toLocaleDateString("en-IN")
++" "
++now.toLocaleTimeString("en-IN");
 
 }
 
 setInterval(updateDateTime,1000);
 
 
-/* ================================
-   MARK ATTENDANCE
-================================ */
+/* =====================================
+   EMPLOYEE ATTENDANCE
+===================================== */
 
-document
-.getElementById("markAttendanceBtn")
-.addEventListener(
-    "click",
-    markAttendance
+document.getElementById(
+"markAttendanceBtn"
+).addEventListener(
+"click",
+markAttendance
 );
 
 
 function markAttendance(){
 
-    const employeeId =
-        sessionStorage.getItem(
-            "employeeId"
-        );
+const id =
+sessionStorage.getItem("employeeId");
 
-    const employeeName =
-        sessionStorage.getItem(
-            "employeeName"
-        );
+const employee =
+employees.find(e=>e.id===id);
 
+const records=getRecords();
 
-    if(!employeeId){
-        return;
-    }
+const now=new Date();
+
+const date =
+now.toLocaleDateString("en-IN");
 
 
-    const records=getRecords();
+const exists =
+records.some(function(r){
 
-    const now=new Date();
+return r.employeeId===id &&
+r.date===date;
 
-    const date =
-        now.toLocaleDateString("en-IN");
-
-
-    const alreadyMarked =
-        records.some(function(record){
-
-            return(
-                record.employeeId===employeeId &&
-                record.date===date
-            );
-
-        });
+});
 
 
-    if(alreadyMarked){
+if(exists){
 
-        showMessage(
-            "employeeMessage",
-            "Attendance already submitted today.",
-            "error"
-        );
+showMessage(
+"employeeMessage",
+"Attendance already exists for today.",
+"error"
+);
 
-        return;
-    }
-
-
-    records.push({
-
-        id:Date.now(),
-
-        employeeId:employeeId,
-
-        employeeName:employeeName,
-
-        date:date,
-
-        time:now.toLocaleTimeString("en-IN"),
-
-        status:"Pending"
-
-    });
+return;
+}
 
 
-    saveRecords(records);
+records.push({
+
+id:Date.now(),
+
+employeeId:employee.id,
+
+employeeName:employee.name,
+
+date:date,
+
+time:now.toLocaleTimeString("en-IN"),
+
+markedBy:"Employee",
+
+status:"Pending"
+
+});
 
 
-    showMessage(
-        "employeeMessage",
-        "Attendance submitted. Waiting for admin approval.",
-        "success"
-    );
+saveRecords(records);
 
 
-    renderEmployeeData();
+showMessage(
+"employeeMessage",
+"Attendance submitted for admin approval.",
+"success"
+);
+
+
+renderEmployeeData();
 
 }
 
 
-/* ================================
+/* =====================================
    EMPLOYEE DATA
-================================ */
+===================================== */
 
 function renderEmployeeData(){
 
-    const employeeId =
-        sessionStorage.getItem(
-            "employeeId"
-        );
+const id =
+sessionStorage.getItem("employeeId");
+
+const employee =
+employees.find(e=>e.id===id);
+
+const records=getRecords();
+
+const mine =
+records.filter(r=>r.employeeId===id);
 
 
-    const records=getRecords();
+const approved =
+mine.filter(r=>r.status==="Approved").length;
+
+const pending =
+mine.filter(r=>r.status==="Pending").length;
 
 
-    const mine =
-        records.filter(function(record){
+document.getElementById(
+"presentDays"
+).textContent=approved;
 
-            return record.employeeId===employeeId;
+document.getElementById(
+"pendingDays"
+).textContent=pending;
 
-        });
-
-
-    const approved =
-        mine.filter(function(record){
-
-            return record.status==="Approved";
-
-        }).length;
+document.getElementById(
+"empMonthlyWage"
+).textContent=
+"₹"+(approved*employee.wage);
 
 
-    const pending =
-        mine.filter(function(record){
+const tbody =
+document.getElementById("employeeHistory");
 
-            return record.status==="Pending";
-
-        }).length;
+tbody.innerHTML="";
 
 
-    document.getElementById(
-        "presentDays"
-    ).textContent=approved;
+if(mine.length===0){
 
+tbody.innerHTML=`
+<tr>
+<td colspan="4">No attendance records yet.</td>
+</tr>`;
 
-    document.getElementById(
-        "pendingDays"
-    ).textContent=pending;
-
-
-    const tbody =
-        document.getElementById(
-            "employeeHistory"
-        );
-
-
-    tbody.innerHTML="";
-
-
-    if(mine.length===0){
-
-        tbody.innerHTML=`
-        <tr>
-            <td colspan="3">
-                No attendance records yet.
-            </td>
-        </tr>`;
-
-        return;
-    }
-
-
-    mine
-    .slice()
-    .reverse()
-    .forEach(function(record){
-
-        const tr=document.createElement("tr");
-
-        tr.innerHTML=`
-        <td>${escapeHTML(record.date)}</td>
-        <td>${escapeHTML(record.time)}</td>
-        <td>${statusBadge(record.status)}</td>
-        `;
-
-        tbody.appendChild(tr);
-
-    });
+return;
 
 }
 
 
-/* ================================
+mine.slice().reverse().forEach(function(r){
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+
+<td>${safe(r.date)}</td>
+
+<td>${safe(r.time)}</td>
+
+<td>${safe(r.markedBy)}</td>
+
+<td>${statusBadge(r.status)}</td>
+
+`;
+
+tbody.appendChild(tr);
+
+});
+
+}
+
+
+/* =====================================
    ADMIN DASHBOARD
-================================ */
+===================================== */
 
 function showAdminDashboard(){
 
-    document.getElementById(
-        "loginScreen"
-    ).style.display="none";
+document.getElementById("loginScreen")
+.style.display="none";
 
-    document.getElementById(
-        "employeeDashboard"
-    ).style.display="none";
+document.getElementById("employeeDashboard")
+.style.display="none";
 
-    document.getElementById(
-        "adminDashboard"
-    ).style.display="block";
+document.getElementById("adminDashboard")
+.style.display="block";
 
 
-    renderAdmin();
+setAdminDate();
+
+fillEmployeeSelect();
+
+renderAdmin();
 
 }
 
 
-/* ================================
-   ADMIN DATA
-================================ */
+/* =====================================
+   ADMIN DATE
+===================================== */
+
+function setAdminDate(){
+
+const input =
+document.getElementById("adminDate");
+
+const now=new Date();
+
+const yyyy=now.getFullYear();
+
+const mm=String(
+now.getMonth()+1
+).padStart(2,"0");
+
+const dd=String(
+now.getDate()
+).padStart(2,"0");
+
+input.value=
+yyyy+"-"+mm+"-"+dd;
+
+}
+
+
+/* =====================================
+   EMPLOYEE SELECT
+===================================== */
+
+function fillEmployeeSelect(){
+
+const select =
+document.getElementById("adminEmployee");
+
+select.innerHTML="";
+
+employees.forEach(function(e){
+
+const option=
+document.createElement("option");
+
+option.value=e.id;
+
+option.textContent=
+e.id+" - "+e.name;
+
+select.appendChild(option);
+
+});
+
+}
+
+
+/* =====================================
+   ADMIN MARK ATTENDANCE
+===================================== */
+
+function adminMarkAttendance(){
+
+const id =
+document.getElementById(
+"adminEmployee"
+).value;
+
+const dateInput =
+document.getElementById(
+"adminDate"
+).value;
+
+
+if(!dateInput){
+
+showMessage(
+"adminMarkMessage",
+"Please select a date.",
+"error"
+);
+
+return;
+
+}
+
+
+const employee =
+employees.find(e=>e.id===id);
+
+const records=getRecords();
+
+
+const parts =
+dateInput.split("-");
+
+const date =
+parts[2]+"/"+
+parts[1]+"/"+
+parts[0];
+
+
+const exists =
+records.some(function(r){
+
+return r.employeeId===id &&
+r.date===date;
+
+});
+
+
+if(exists){
+
+showMessage(
+"adminMarkMessage",
+"Attendance already exists for this employee on this date.",
+"error"
+);
+
+return;
+
+}
+
+
+records.push({
+
+id:Date.now(),
+
+employeeId:employee.id,
+
+employeeName:employee.name,
+
+date:date,
+
+time:new Date().toLocaleTimeString("en-IN"),
+
+markedBy:"Admin",
+
+status:"Approved"
+
+});
+
+
+saveRecords(records);
+
+
+showMessage(
+"adminMarkMessage",
+"Attendance marked by Admin successfully.",
+"success"
+);
+
+
+renderAdmin();
+
+}
+
+
+/* =====================================
+   ADMIN RENDER
+===================================== */
 
 function renderAdmin(){
 
-    const records=getRecords();
+const records=getRecords();
 
 
-    const pending =
-        records.filter(function(r){
+const pending =
+records.filter(r=>r.status==="Pending").length;
 
-            return r.status==="Pending";
+const approved =
+records.filter(r=>r.status==="Approved").length;
 
-        }).length;
-
-
-    const approved =
-        records.filter(function(r){
-
-            return r.status==="Approved";
-
-        }).length;
+const rejected =
+records.filter(r=>r.status==="Rejected").length;
 
 
-    const rejected =
-        records.filter(function(r){
+document.getElementById(
+"totalRequests"
+).textContent=records.length;
 
-            return r.status==="Rejected";
+document.getElementById(
+"totalPending"
+).textContent=pending;
 
-        }).length;
+document.getElementById(
+"totalApproved"
+).textContent=approved;
 
-
-    document.getElementById(
-        "totalRequests"
-    ).textContent=records.length;
-
-    document.getElementById(
-        "totalPending"
-    ).textContent=pending;
-
-    document.getElementById(
-        "totalApproved"
-    ).textContent=approved;
-
-    document.getElementById(
-        "totalRejected"
-    ).textContent=rejected;
+document.getElementById(
+"totalRejected"
+).textContent=rejected;
 
 
-    renderAdminTable(records);
-
-    renderEmployeeSummary(records);
+renderAdminTable(records);
+renderSummary(records);
 
 }
 
 
-/* ================================
+/* =====================================
    ADMIN TABLE
-================================ */
+===================================== */
 
 function renderAdminTable(records){
 
-    const tbody =
-        document.getElementById(
-            "adminTable"
-        );
+const tbody =
+document.getElementById("adminTable");
 
-    tbody.innerHTML="";
+tbody.innerHTML="";
 
 
-    if(records.length===0){
+if(records.length===0){
 
-        tbody.innerHTML=`
-        <tr>
-            <td colspan="6">
-                No attendance requests.
-            </td>
-        </tr>`;
+tbody.innerHTML=`
+<tr>
+<td colspan="7">No attendance records.</td>
+</tr>`;
 
-        return;
-    }
-
-
-    records
-    .slice()
-    .reverse()
-    .forEach(function(record){
-
-        const tr=document.createElement("tr");
-
-        let action="-";
-
-
-        if(record.status==="Pending"){
-
-            action=`
-            <button
-                class="approveBtn"
-                type="button"
-                onclick="updateAttendance(${record.id},'Approved')"
-            >
-                APPROVE
-            </button>
-
-            <button
-                class="rejectBtn"
-                type="button"
-                onclick="updateAttendance(${record.id},'Rejected')"
-            >
-                REJECT
-            </button>`;
-
-        }
-
-
-        tr.innerHTML=`
-        <td>${escapeHTML(record.employeeId)}</td>
-
-        <td>${escapeHTML(record.employeeName)}</td>
-
-        <td>${escapeHTML(record.date)}</td>
-
-        <td>${escapeHTML(record.time)}</td>
-
-        <td>${statusBadge(record.status)}</td>
-
-        <td>${action}</td>
-        `;
-
-
-        tbody.appendChild(tr);
-
-    });
+return;
 
 }
 
 
-/* ================================
+records.slice().reverse().forEach(function(r){
+
+const tr=document.createElement("tr");
+
+let action="-";
+
+
+if(r.status==="Pending"){
+
+action=`
+
+<button
+class="approveBtn"
+onclick="updateStatus(${r.id},'Approved')"
+>
+APPROVE
+</button>
+
+<button
+class="rejectBtn"
+onclick="updateStatus(${r.id},'Rejected')"
+>
+REJECT
+</button>
+
+`;
+
+}
+
+
+tr.innerHTML=`
+
+<td>${safe(r.employeeId)}</td>
+
+<td>${safe(r.employeeName)}</td>
+
+<td>${safe(r.date)}</td>
+
+<td>${safe(r.time)}</td>
+
+<td>${safe(r.markedBy)}</td>
+
+<td>${statusBadge(r.status)}</td>
+
+<td>${action}</td>
+
+`;
+
+
+tbody.appendChild(tr);
+
+});
+
+}
+
+
+/* =====================================
    APPROVE / REJECT
-================================ */
+===================================== */
 
-function updateAttendance(
-    recordId,
-    newStatus
-){
+function updateStatus(id,status){
 
-    const records=getRecords();
+const records=getRecords();
 
-
-    const record =
-        records.find(function(r){
-
-            return r.id===recordId;
-
-        });
+const record =
+records.find(r=>r.id===id);
 
 
-    if(!record){
-        return;
-    }
+if(!record)return;
 
 
-    record.status=newStatus;
+record.status=status;
 
-    saveRecords(records);
+saveRecords(records);
 
-    renderAdmin();
+renderAdmin();
 
 }
 
 
-/* ================================
-   EMPLOYEE SUMMARY
-================================ */
+/* =====================================
+   SUMMARY
+===================================== */
 
-function renderEmployeeSummary(records){
+function renderSummary(records){
 
-    const tbody =
-        document.getElementById(
-            "employeeSummary"
-        );
+const tbody =
+document.getElementById(
+"employeeSummary"
+);
 
-    tbody.innerHTML="";
-
-
-    const employees={};
+tbody.innerHTML="";
 
 
-    records.forEach(function(record){
+employees.forEach(function(e){
 
-        if(!employees[record.employeeId]){
+const approved =
+records.filter(function(r){
 
-            employees[record.employeeId]={
-                name:record.employeeName,
-                approved:0
-            };
+return r.employeeId===e.id &&
+r.status==="Approved";
 
-        }
-
-
-        if(record.status==="Approved"){
-
-            employees[
-                record.employeeId
-            ].approved++;
-
-        }
-
-    });
+}).length;
 
 
-    const ids=Object.keys(employees);
+const monthly =
+approved*e.wage;
 
 
-    if(ids.length===0){
+const tr=document.createElement("tr");
 
-        tbody.innerHTML=`
-        <tr>
-            <td colspan="3">
-                No employees yet.
-            </td>
-        </tr>`;
+tr.innerHTML=`
 
-        return;
-    }
+<td>${e.id}</td>
 
+<td>${e.name}</td>
 
-    ids.forEach(function(id){
+<td>₹${e.wage}</td>
 
-        const employee=employees[id];
+<td>${approved}</td>
 
-        const tr=document.createElement("tr");
+<td><b>₹${monthly}</b></td>
 
-        tr.innerHTML=`
-        <td>${escapeHTML(id)}</td>
-        <td>${escapeHTML(employee.name)}</td>
-        <td><b>${employee.approved}</b></td>
-        `;
+`;
 
-        tbody.appendChild(tr);
+tbody.appendChild(tr);
 
-    });
+});
 
 }
 
 
-/* ================================
-   STATUS
-================================ */
+/* =====================================
+   STATUS BADGE
+===================================== */
 
 function statusBadge(status){
 
-    let className="pending";
+let cls="pending";
+
+if(status==="Approved")cls="approved";
+
+if(status==="Rejected")cls="rejected";
 
 
-    if(status==="Approved"){
-        className="approved";
-    }
-
-
-    if(status==="Rejected"){
-        className="rejected";
-    }
-
-
-    return`
-    <span class="badge ${className}">
-        ${status}
-    </span>`;
+return`
+<span class="badge ${cls}">
+${status}
+</span>`;
 
 }
 
 
-/* ================================
-   SECURITY
-================================ */
-
-function escapeHTML(value){
-
-    return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-
-}
-
-
-/* ================================
+/* =====================================
    MESSAGE
-================================ */
+===================================== */
 
-function showMessage(
-    id,
-    text,
-    type
-){
+function showMessage(id,text,type){
 
-    const element=
-        document.getElementById(id);
+const el=document.getElementById(id);
 
-    element.textContent=text;
+el.textContent=text;
 
-    element.className=
-        "message "+type;
+el.className="message "+type;
 
-    element.style.display="block";
+el.style.display="block";
 
 }
 
 
 function clearMessage(id){
 
-    const element=
-        document.getElementById(id);
+const el=document.getElementById(id);
 
-    element.textContent="";
+el.textContent="";
 
-    element.style.display="none";
+el.style.display="none";
 
 }
 
 
-/* ================================
+/* =====================================
+   SAFE TEXT
+===================================== */
+
+function safe(value){
+
+return String(value)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+/* =====================================
    LOGOUT
-================================ */
+===================================== */
 
 function logout(){
 
-    sessionStorage.clear();
+sessionStorage.clear();
 
+document.getElementById(
+"employeeDashboard"
+).style.display="none";
 
-    document.getElementById(
-        "employeeDashboard"
-    ).style.display="none";
+document.getElementById(
+"adminDashboard"
+).style.display="none";
 
-
-    document.getElementById(
-        "adminDashboard"
-    ).style.display="none";
-
-
-    document.getElementById(
-        "loginScreen"
-    ).style.display="flex";
-
-
-    document.getElementById(
-        "employeeId"
-    ).value="";
-
-
-    document.getElementById(
-        "employeeName"
-    ).value="";
-
-
-    document.getElementById(
-        "adminUsername"
-    ).value="";
-
-
-    document.getElementById(
-        "adminPassword"
-    ).value="";
+document.getElementById(
+"loginScreen"
+).style.display="flex";
 
 }
 
 
-/* ================================
+/* =====================================
    RESTORE SESSION
-================================ */
+===================================== */
 
-window.addEventListener(
-    "load",
-    function(){
+window.addEventListener("load",function(){
 
-        const role =
-            sessionStorage.getItem(
-                "loginRole"
-            );
+const role =
+sessionStorage.getItem("loginRole");
 
+if(role==="employee"){
+showEmployeeDashboard();
+}
 
-        if(role==="employee"){
-            showEmployeeDashboard();
-        }
+if(role==="admin"){
+showAdminDashboard();
+}
 
-
-        if(role==="admin"){
-            showAdminDashboard();
-        }
-
-    }
-);
+});
 
 </script>
 

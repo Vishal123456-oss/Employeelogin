@@ -36,6 +36,8 @@ label{font-size:13px;font-weight:bold;color:#4c5668}
 .approveBtn{background:#00a152;color:#fff;margin-right:5px;margin-bottom:5px}
 .rejectBtn{background:#e53935;color:#fff;margin-right:5px;margin-bottom:5px}
 .removeBtn{background:#7b1fa2;color:#fff;margin-bottom:5px}
+.activateBtn{background:#00897b;color:#fff;margin-bottom:5px}
+.manageBtn{background:#455a64;color:#fff;margin-bottom:5px}
 .tableWrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:850px}
 th,td{padding:11px;border-bottom:1px solid #e5e8ed;text-align:left}
@@ -63,10 +65,10 @@ th{background:#f3f6fa;white-space:nowrap}
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
   import {
-    getFirestore, collection, getDocs, query, where, addDoc,
-    updateDoc, deleteDoc, doc, serverTimestamp
+    getFirestore, collection, getDocs, getDoc, setDoc, query, where, addDoc,
+    updateDoc, deleteDoc, doc, serverTimestamp, onSnapshot
   } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -82,21 +84,28 @@ th{background:#f3f6fa;white-space:nowrap}
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const creatorApp = initializeApp(firebaseConfig, "employeeCreator");
+  const creatorAuth = getAuth(creatorApp);
 
   window.firebaseAuth = auth;
   window.firebaseDB = db;
   window.firebaseFns = {
     signInWithEmailAndPassword,
     signOut,
+    createUserWithEmailAndPassword,
+    creatorAuth,
     collection,
     getDocs,
+    getDoc,
+    setDoc,
     query,
     where,
     addDoc,
     updateDoc,
     deleteDoc,
     doc,
-    serverTimestamp
+    serverTimestamp,
+    onSnapshot
   };
 </script>
 
@@ -217,6 +226,26 @@ th{background:#f3f6fa;white-space:nowrap}
 </div>
 
 <div class="panel">
+<h3>👥 Employee Management</h3>
+<p class="small">Add new employees or deactivate/reactivate an employee. Login accounts are created in Firebase Authentication automatically.</p>
+<div class="formGrid">
+<div><label>Employee ID</label><input id="newEmpId" placeholder="EMP017"></div>
+<div><label>Name</label><input id="newEmpName" placeholder="Employee Name"></div>
+<div><label>Per Day Wage</label><input id="newEmpWage" type="number" min="0" step="1" placeholder="500"></div>
+</div>
+<label>Login Password</label>
+<input id="newEmpPassword" type="password" placeholder="Minimum 6 characters">
+<button id="addEmployeeBtn" class="adminMarkBtn" type="button">ADD EMPLOYEE</button>
+<div id="employeeManageMessage" class="message"></div>
+<div class="tableWrap" style="margin-top:15px">
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Wage</th><th>Email</th><th>Status</th><th>Action</th></tr></thead>
+<tbody id="employeeManagementTable"></tbody>
+</table>
+</div>
+</div>
+
+<div class="panel">
 <h3>➕ Admin Mark Attendance</h3>
 <p class="small">Admin can mark attendance when an employee has not marked attendance.</p>
 
@@ -264,579 +293,279 @@ th{background:#f3f6fa;white-space:nowrap}
 <script>
 document.addEventListener("DOMContentLoaded", function(){
 
-const employees=[
-{id:"EMP001",name:"VIKRAM",password:"Vikram@001",wage:600},
-{id:"EMP002",name:"VISHAL KUMAR",password:"Vishal@002",wage:600},
-{id:"EMP003",name:"VICKY KUMAR",password:"Vicky@003",wage:550},
-{id:"EMP004",name:"SAHIL KUMAR",password:"Sahil@004",wage:550},
-{id:"EMP005",name:"AMAN KUMAR",password:"Aman@005",wage:470},
-{id:"EMP006",name:"GURDEEP SINGH",password:"Gurdeep@006",wage:520},
-{id:"EMP007",name:"GIRDHARI LAL",password:"Girdhari@007",wage:470},
-{id:"EMP008",name:"UTTAM KUMAR",password:"Uttam@008",wage:450},
-{id:"EMP009",name:"OM PRAKASH",password:"Om@009",wage:450},
-{id:"EMP010",name:"RAHUL KUMAR",password:"Rahul@010",wage:700},
-{id:"EMP011",name:"RAKESH SINGH",password:"Rakesh@011",wage:430},
-{id:"EMP012",name:"RAKESH SHARMA",password:"RakeshS@012",wage:480},
-{id:"EMP013",name:"VIJAY",password:"Vijay@013",wage:430},
-{id:"EMP014",name:"SUDESH SINGH",password:"Sudesh@014",wage:450},
-{id:"EMP015",name:"GOKUL",password:"Gokul@015",wage:460},
-{id:"EMP016",name:"VARUN",password:"Varun@016",wage:450}
+const seedEmployees=[
+{id:"EMP001",name:"VIKRAM",wage:600},{id:"EMP002",name:"VISHAL KUMAR",wage:600},
+{id:"EMP003",name:"VICKY KUMAR",wage:550},{id:"EMP004",name:"SAHIL KUMAR",wage:550},
+{id:"EMP005",name:"AMAN KUMAR",wage:470},{id:"EMP006",name:"GURDEEP SINGH",wage:520},
+{id:"EMP007",name:"GIRDHARI LAL",wage:470},{id:"EMP008",name:"UTTAM KUMAR",wage:450},
+{id:"EMP009",name:"OM PRAKASH",wage:450},{id:"EMP010",name:"RAHUL KUMAR",wage:700},
+{id:"EMP011",name:"RAKESH SINGH",wage:430},{id:"EMP012",name:"RAKESH SHARMA",wage:480},
+{id:"EMP013",name:"VIJAY",wage:430},{id:"EMP014",name:"SUDESH SINGH",wage:450},
+{id:"EMP015",name:"GOKUL",wage:460},{id:"EMP016",name:"VARUN",wage:450}
 ];
 
+let employees=[];
 const ADMIN_EMAIL="admin@employeelogin.com";
 const ADMIN_PASSWORD="Admin@1234";
 const LAST_UPDATED_KEY="employee_attendance_last_updated";
 const VISITOR_KEY="employee_attendance_visitors";
+const EMP_COLLECTION="Employees";
+let attendanceUnsubscribe=null;
+let realtimeAttendanceRecords=[];
 
-function firebaseReady(){
-  return !!(window.firebaseAuth && window.firebaseDB && window.firebaseFns);
+function firebaseReady(){return !!(window.firebaseAuth&&window.firebaseDB&&window.firebaseFns);}
+function employeeEmail(id){return id.toLowerCase()+"@gmail.com";}
+function showMessage(id,text,type){const el=document.getElementById(id);if(!el)return;el.textContent=text;el.className="message "+type;el.style.display="block";}
+function clearMessage(id){const el=document.getElementById(id);if(!el)return;el.textContent="";el.style.display="none";}
+function safe(v){return String(v==null?"":v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+function statusBadge(status){const cls=status==="Approved"?"approved":status==="Rejected"?"rejected":"pending";return '<span class="badge '+cls+'">'+safe(status)+'</span>';}
+function attendanceBadge(type){return type==="H"?'<span class="badge halfBadge">HALF DAY</span>':'<span class="badge fullBadge">FULL DAY</span>';}
+
+async function loadEmployees(){
+  const {collection,getDocs}=window.firebaseFns;
+  const snap=await getDocs(collection(window.firebaseDB,EMP_COLLECTION));
+  employees=snap.docs.map(d=>{
+    const x=d.data();
+    return {id:String(x.id||x.employeeId||d.id).toUpperCase(),name:String(x.name||x.Name||""),wage:Number(x.wage||x.Wage||0),email:x.email||employeeEmail(String(x.id||x.employeeId||d.id)),active:x.active!==false};
+  }).filter(x=>x.id&&x.name);
+
+  // Normalize existing employee documents so the new login/rules work with older data.
+  for(const e of employees){
+    await window.firebaseFns.setDoc(window.firebaseFns.doc(window.firebaseDB,EMP_COLLECTION,e.id),{id:e.id,name:e.name,wage:e.wage,email:e.email,active:e.active},{merge:true});
+  }
+
+  // One-time migration/seed: only missing employees are added to Firestore.
+  const existing=new Set(employees.map(e=>e.id));
+  if(!employees.length){
+    for(const e of seedEmployees){
+      await window.firebaseFns.setDoc(window.firebaseFns.doc(window.firebaseDB,EMP_COLLECTION,e.id),{
+        id:e.id,name:e.name,wage:e.wage,email:employeeEmail(e.id),active:true,createdAt:window.firebaseFns.serverTimestamp()
+      });
+    }
+    const snap2=await getDocs(collection(window.firebaseDB,EMP_COLLECTION));
+    employees=snap2.docs.map(d=>{const x=d.data();return {id:String(x.id||d.id).toUpperCase(),name:String(x.name||""),wage:Number(x.wage||0),email:x.email||employeeEmail(d.id),active:x.active!==false};}).filter(x=>x.id&&x.name);
+  } else {
+    for(const e of seedEmployees){
+      if(!existing.has(e.id)){
+        await window.firebaseFns.setDoc(window.firebaseFns.doc(window.firebaseDB,EMP_COLLECTION,e.id),{...e,email:employeeEmail(e.id),active:true,createdAt:window.firebaseFns.serverTimestamp()});
+        employees.push({...e,email:employeeEmail(e.id),active:true});
+      }
+    }
+  }
+  employees.sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
+  return employees;
+}
+
+async function getEmployee(id){
+  const {getDoc,doc}=window.firebaseFns;
+  const snap=await getDoc(doc(window.firebaseDB,EMP_COLLECTION,id));
+  if(!snap.exists())return null;
+  const x=snap.data();
+  return {id:String(x.id||id).toUpperCase(),name:String(x.name||""),wage:Number(x.wage||0),email:x.email||employeeEmail(id),active:x.active!==false};
 }
 
 async function getRecords(){
-  if(!firebaseReady()) return [];
-  try{
-    const {collection,getDocs,query,where}=window.firebaseFns;
+  // When the realtime listener is active, use its latest Firestore snapshot.
+  if(attendanceUnsubscribe && Array.isArray(realtimeAttendanceRecords)){
     const role=sessionStorage.getItem("loginRole");
-    let snap;
-
     if(role==="employee"){
-      const employeeId=sessionStorage.getItem("employeeId");
-      const e=employees.find(x=>x.id===employeeId);
-      if(!e) return [];
-      snap=await getDocs(
-        query(collection(window.firebaseDB,"attendance"),where("employeeEmail","==",employeeEmail(e.id)))
-      );
-    }else{
-      snap=await getDocs(collection(window.firebaseDB,"attendance"));
+      const email=(await getEmployee(sessionStorage.getItem("employeeId"))||{}).email;
+      return realtimeAttendanceRecords.filter(r=>r.employeeEmail===email);
     }
+    return [...realtimeAttendanceRecords];
+  }
 
-    return snap.docs.map(d=>({id:d.id,...d.data()}));
-  }catch(e){
-    console.error("Firestore read error:",e);
-    showMessage(
-      sessionStorage.getItem("loginRole")==="admin" ? "adminMarkMessage" : "employeeMessage",
-      "Firebase/Firestore read error. Check Firestore rules and database.",
-      "error"
+  const {collection,getDocs,query,where}=window.firebaseFns;
+  const role=sessionStorage.getItem("loginRole");
+  let snap;
+  if(role==="employee"){
+    const id=sessionStorage.getItem("employeeId");
+    const e=employees.find(x=>x.id===id)||await getEmployee(id);
+    if(!e)return [];
+    snap=await getDocs(query(collection(window.firebaseDB,"attendance"),where("employeeEmail","==",e.email)));
+  }else{
+    snap=await getDocs(collection(window.firebaseDB,"attendance"));
+  }
+  return snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+function stopAttendanceListener(){
+  if(typeof attendanceUnsubscribe==="function"){
+    attendanceUnsubscribe();
+  }
+  attendanceUnsubscribe=null;
+  realtimeAttendanceRecords=[];
+}
+
+function startAttendanceListener(){
+  stopAttendanceListener();
+  if(!firebaseReady()) return;
+
+  const {collection,onSnapshot,query,where}=window.firebaseFns;
+  const role=sessionStorage.getItem("loginRole");
+
+  let targetQuery;
+  if(role==="employee"){
+    const id=sessionStorage.getItem("employeeId");
+    const e=employees.find(x=>x.id===id);
+    if(!e) return;
+    targetQuery=query(
+      collection(window.firebaseDB,"attendance"),
+      where("employeeEmail","==",e.email)
     );
-    return [];
+  }else if(role==="admin"){
+    targetQuery=collection(window.firebaseDB,"attendance");
+  }else{
+    return;
   }
+
+  attendanceUnsubscribe=onSnapshot(
+    targetQuery,
+    async (snap)=>{
+      realtimeAttendanceRecords=snap.docs.map(d=>({id:d.id,...d.data()}));
+      localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());
+      updateLastUpdated();
+
+      if(role==="employee"){
+        await renderEmployeeData(realtimeAttendanceRecords);
+      }else if(role==="admin"){
+        await renderAdmin(realtimeAttendanceRecords);
+      }
+    },
+    (error)=>{
+      console.error("Realtime attendance listener error:",error);
+      const messageId=role==="admin"?"adminMarkMessage":"employeeMessage";
+      showMessage(messageId,"Realtime Firebase update failed. Please check Firestore Rules.","error");
+    }
+  );
 }
 
-function employeeEmail(id){
-  return id.toLowerCase()+"@gmail.com";
-}
-
-async function addRecord(record){
-  const {collection,addDoc,serverTimestamp}=window.firebaseFns;
-  return await addDoc(collection(window.firebaseDB,"attendance"),{
-    ...record,
-    createdAt:serverTimestamp()
-  });
-}
-
-async function saveRecordStatus(id,status){
-  const {doc,updateDoc}=window.firebaseFns;
-  await updateDoc(doc(window.firebaseDB,"attendance",String(id)),{status});
-}
-
-async function removeRecord(id){
-  const {doc,deleteDoc}=window.firebaseFns;
-  await deleteDoc(doc(window.firebaseDB,"attendance",String(id)));
-}
-
-function formatDate(d){
-  return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
-}
-
-function convertInputDate(v){
-  const p=v.split("-");
-  return p[2]+"/"+p[1]+"/"+p[0];
-}
-
-function safe(v){
-  return String(v==null?"":v)
-  .replaceAll("&","&amp;")
-  .replaceAll("<","&lt;")
-  .replaceAll(">","&gt;")
-  .replaceAll('"',"&quot;")
-  .replaceAll("'","&#039;");
-}
-
-function showMessage(id,text,type){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.textContent=text;
-  el.className="message "+type;
-  el.style.display="block";
-}
-
-function clearMessage(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.textContent="";
-  el.style.display="none";
-}
-
-function statusBadge(status){
-  const cls=status==="Approved"?"approved":status==="Rejected"?"rejected":"pending";
-  return '<span class="badge '+cls+'">'+safe(status)+'</span>';
-}
-
-function attendanceBadge(type){
-  return type==="H"
-  ?'<span class="badge halfBadge">HALF DAY</span>'
-  :'<span class="badge fullBadge">FULL DAY</span>';
-}
-
-function updateClock(){
-  const now=new Date();
-  const text=now.toLocaleDateString("en-IN")+" "+now.toLocaleTimeString("en-IN");
-  document.getElementById("siteDateTime").textContent=text;
-  document.getElementById("currentDateTime").textContent=text;
-}
-
-function updateLastUpdated(){
-  let last=localStorage.getItem(LAST_UPDATED_KEY);
-  if(!last){
-    last=new Date().toISOString();
-    localStorage.setItem(LAST_UPDATED_KEY,last);
-  }
-  const text=new Date(last).toLocaleDateString("en-IN")+" "+new Date(last).toLocaleTimeString("en-IN");
-  document.getElementById("employeeLastUpdated").textContent=text;
-  document.getElementById("adminLastUpdated").textContent=text;
-}
-
-function updateVisitorCount(){
-  let count=Number(localStorage.getItem(VISITOR_KEY))||0;
-  count++;
-  localStorage.setItem(VISITOR_KEY,String(count));
-  document.getElementById("visitorCount").textContent=count;
-}
-
-function setAdminDate(){
-  const d=new Date();
-  document.getElementById("adminDate").value=
-    d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-}
-
-function fillEmployeeSelect(){
-  const s=document.getElementById("adminEmployee");
-  s.innerHTML="";
-  employees.forEach(e=>{
-    const o=document.createElement("option");
-    o.value=e.id;
-    o.textContent=e.id+" - "+e.name;
-    s.appendChild(o);
-  });
-}
-
-function updateEmployeeWagePreview(){
-  const id=sessionStorage.getItem("employeeId");
-  const e=employees.find(x=>x.id===id);
-  if(!e)return;
-  const type=document.getElementById("employeeAttendanceType").value;
-  const ot=Number(document.getElementById("employeeOTHours").value)||0;
-  const base=type==="H"?e.wage/2:e.wage;
-  const otWage=ot*(e.wage/8);
-  document.getElementById("employeeWagePreview").value="₹"+(base+otWage).toFixed(2);
-}
+async function addRecord(record){const {collection,addDoc,serverTimestamp}=window.firebaseFns;return addDoc(collection(window.firebaseDB,"attendance"),{...record,createdAt:serverTimestamp()});}
+async function saveRecordStatus(id,status){const {doc,updateDoc}=window.firebaseFns;await updateDoc(doc(window.firebaseDB,"attendance",String(id)),{status});}
+async function removeRecord(id){const {doc,deleteDoc}=window.firebaseFns;await deleteDoc(doc(window.firebaseDB,"attendance",String(id)));}
+function formatDate(d){return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
+function convertInputDate(v){const p=v.split("-");return p[2]+"/"+p[1]+"/"+p[0];}
+function updateClock(){const now=new Date();const t=now.toLocaleDateString("en-IN")+" "+now.toLocaleTimeString("en-IN");document.getElementById("siteDateTime").textContent=t;document.getElementById("currentDateTime").textContent=t;}
+function updateLastUpdated(){const last=localStorage.getItem(LAST_UPDATED_KEY)||new Date().toISOString();const t=new Date(last).toLocaleDateString("en-IN")+" "+new Date(last).toLocaleTimeString("en-IN");document.getElementById("employeeLastUpdated").textContent=t;document.getElementById("adminLastUpdated").textContent=t;}
+function updateVisitorCount(){let c=Number(localStorage.getItem(VISITOR_KEY))||0;c++;localStorage.setItem(VISITOR_KEY,String(c));document.getElementById("visitorCount").textContent=c;}
+function setAdminDate(){const d=new Date();document.getElementById("adminDate").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function fillEmployeeSelect(){const s=document.getElementById("adminEmployee");s.innerHTML="";employees.filter(e=>e.active).forEach(e=>{const o=document.createElement("option");o.value=e.id;o.textContent=e.id+" - "+e.name;s.appendChild(o);});}
+function updateEmployeeWagePreview(){const id=sessionStorage.getItem("employeeId");const e=employees.find(x=>x.id===id);if(!e)return;const type=document.getElementById("employeeAttendanceType").value;const ot=Number(document.getElementById("employeeOTHours").value)||0;const base=type==="H"?e.wage/2:e.wage;document.getElementById("employeeWagePreview").value="₹"+(base+ot*(e.wage/8)).toFixed(2);}
 
 async function login(){
   clearMessage("loginMessage");
-
-  if(!firebaseReady()){
-    showMessage("loginMessage","Firebase is not loaded. Please refresh the page.","error");
-    return;
-  }
-
-  const type=document.getElementById("loginType").value;
-
   try{
+    if(!firebaseReady()){showMessage("loginMessage","Firebase is not loaded. Refresh the page.","error");return;}
+    const type=document.getElementById("loginType").value;
     if(type==="employee"){
       const id=document.getElementById("employeeId").value.trim().toUpperCase();
       const password=document.getElementById("employeePassword").value;
-      const employee=employees.find(e=>e.id===id);
-
-      if(!employee){
-        showMessage("loginMessage","Invalid Employee ID or Password.","error");
-        return;
-      }
-
-      await window.firebaseFns.signInWithEmailAndPassword(
-        window.firebaseAuth,
-        employeeEmail(employee.id),
-        password
-      );
-
-      sessionStorage.setItem("loginRole","employee");
-      sessionStorage.setItem("employeeId",employee.id);
-      sessionStorage.setItem("employeeName",employee.name);
-
-      await showEmployeeDashboard();
-      return;
+      if(!/^EMP\d+$/.test(id)){showMessage("loginMessage","Enter a valid Employee ID.","error");return;}
+      const email=employeeEmail(id);
+      await window.firebaseFns.signInWithEmailAndPassword(window.firebaseAuth,email,password);
+      const e=await getEmployee(id);
+      if(!e||!e.active){await window.firebaseFns.signOut(window.firebaseAuth);showMessage("loginMessage","This employee account is inactive or not registered.","error");return;}
+      employees=[...employees.filter(x=>x.id!==e.id),e].sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
+      sessionStorage.setItem("loginRole","employee");sessionStorage.setItem("employeeId",e.id);sessionStorage.setItem("employeeName",e.name);await showEmployeeDashboard();return;
     }
-
     const username=document.getElementById("adminUsername").value.trim().toUpperCase();
     const password=document.getElementById("adminPassword").value;
-
-    if(username!=="ADMIN" || password!=="Admin@1234"){
-      showMessage("loginMessage","Invalid Admin Username or Password.","error");
-      return;
-    }
-
-    await window.firebaseFns.signInWithEmailAndPassword(
-      window.firebaseAuth,
-      ADMIN_EMAIL,
-      ADMIN_PASSWORD
-    );
-
-    sessionStorage.setItem("loginRole","admin");
-    await showAdminDashboard();
-
-  }catch(error){
-    console.error(error);
-    let msg="Invalid Employee ID or Password.";
-    if(type==="admin") msg="Invalid Admin Username or Password.";
-    showMessage("loginMessage",msg,"error");
-  }
+    if(username!=="ADMIN"){showMessage("loginMessage","Invalid Admin Username or Password.","error");return;}
+    await window.firebaseFns.signInWithEmailAndPassword(window.firebaseAuth,ADMIN_EMAIL,password);
+    sessionStorage.setItem("loginRole","admin");await showAdminDashboard();
+  }catch(error){console.error(error);showMessage("loginMessage",typeOfLoginError(error),"error");}
 }
+function typeOfLoginError(error){return error&&error.code==="auth/invalid-credential"?"Invalid Username or Password.":"Invalid Employee ID or Password.";}
 
 async function showEmployeeDashboard(){
-  document.getElementById("loginScreen").style.display="none";
-  document.getElementById("adminDashboard").style.display="none";
-  document.getElementById("employeeDashboard").style.display="block";
-
-  const id=sessionStorage.getItem("employeeId");
-  const e=employees.find(x=>x.id===id);
-  if(!e){await logout();return;}
-
-  document.getElementById("empIdDisplay").textContent=e.id;
-  document.getElementById("employeeNameDisplay").textContent=e.name;
-  document.getElementById("employeeWelcome").textContent="Welcome, "+e.name;
-  document.getElementById("empDailyWage").textContent="₹"+e.wage;
-
-  updateEmployeeWagePreview();
-  await renderEmployeeData();
-  updateLastUpdated();
+  document.getElementById("loginScreen").style.display="none";document.getElementById("adminDashboard").style.display="none";document.getElementById("employeeDashboard").style.display="block";
+  const id=sessionStorage.getItem("employeeId");const e=await getEmployee(id);if(!e){await logout();return;}
+  employees=[...employees.filter(x=>x.id!==e.id),e];
+  document.getElementById("empIdDisplay").textContent=e.id;document.getElementById("employeeNameDisplay").textContent=e.name;document.getElementById("employeeWelcome").textContent="Welcome, "+e.name;document.getElementById("empDailyWage").textContent="₹"+e.wage;updateEmployeeWagePreview();await renderEmployeeData();startAttendanceListener();updateLastUpdated();
 }
 
 async function markAttendance(){
-  const id=sessionStorage.getItem("employeeId");
-  const e=employees.find(x=>x.id===id);
-  if(!e){
-    showMessage("employeeMessage","Please login again.","error");
-    return;
-  }
-
-  const type=document.getElementById("employeeAttendanceType").value;
-  const ot=Number(document.getElementById("employeeOTHours").value)||0;
-
-  if(ot<0){
-    showMessage("employeeMessage","OT hours cannot be negative.","error");
-    return;
-  }
-
-  try{
-    const records=await getRecords();
-    const date=formatDate(new Date());
-
-    if(records.some(r=>r.employeeId===id && r.date===date)){
-      showMessage("employeeMessage","Attendance already exists for today.","error");
-      return;
-    }
-
-    await addRecord({
-      employeeId:e.id,
-      employeeName:e.name,
-      employeeEmail:employeeEmail(e.id),
-      date:date,
-      time:new Date().toLocaleTimeString("en-IN"),
-      type:type,
-      otHours:ot,
-      markedBy:"Employee",
-      status:"Pending"
-    });
-
-    localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());
-    showMessage("employeeMessage","Attendance submitted. Waiting for Admin approval.","success");
-    await renderEmployeeData();
-    updateLastUpdated();
-
-  }catch(error){
-    console.error(error);
-    showMessage("employeeMessage","Attendance could not be saved to Firebase.","error");
-  }
+  const id=sessionStorage.getItem("employeeId");const e=await getEmployee(id);if(!e||!e.active){showMessage("employeeMessage","Please login again.","error");return;}
+  const type=document.getElementById("employeeAttendanceType").value;const ot=Number(document.getElementById("employeeOTHours").value)||0;if(ot<0){showMessage("employeeMessage","OT hours cannot be negative.","error");return;}
+  try{const records=await getRecords();const date=formatDate(new Date());if(records.some(r=>r.employeeId===id&&r.date===date)){showMessage("employeeMessage","Attendance already exists for today.","error");return;}await addRecord({employeeId:e.id,employeeName:e.name,employeeEmail:e.email,date,time:new Date().toLocaleTimeString("en-IN"),type,otHours:ot,markedBy:"Employee",status:"Pending"});localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());showMessage("employeeMessage","Attendance submitted. Waiting for Admin approval.","success");updateLastUpdated();}catch(error){console.error(error);showMessage("employeeMessage","Attendance could not be saved to Firebase.","error");}
 }
 
-async function renderEmployeeData(){
-  const id=sessionStorage.getItem("employeeId");
-  const e=employees.find(x=>x.id===id);
-  if(!e)return;
-
-  const mine=await getRecords();
-  const approved=mine.filter(r=>r.status==="Approved");
-  const pending=mine.filter(r=>r.status==="Pending");
-
-  const full=approved.filter(r=>(r.type||"P")==="P").length;
-  const half=approved.filter(r=>r.type==="H").length;
-  const ot=approved.reduce((s,r)=>s+(Number(r.otHours)||0),0);
-  const otWage=ot*(e.wage/8);
-  const monthly=full*e.wage+half*e.wage/2+otWage;
-
-  document.getElementById("fullDays").textContent=full;
-  document.getElementById("halfDays").textContent=half;
-  document.getElementById("pendingDays").textContent=pending.length;
-  document.getElementById("empOTHours").textContent=ot.toFixed(2);
-  document.getElementById("empOTWage").textContent="₹"+otWage.toFixed(2);
-  document.getElementById("empMonthlyWage").textContent="₹"+monthly.toFixed(2);
-
-  const tbody=document.getElementById("employeeHistory");
-  tbody.innerHTML="";
-
-  if(!mine.length){
-    tbody.innerHTML='<tr><td colspan="7">No attendance records yet.</td></tr>';
-    return;
-  }
-
-  mine.slice().reverse().forEach(r=>{
-    const row=document.createElement("tr");
-    const rh=Number(r.otHours)||0;
-    row.innerHTML=
-      "<td>"+safe(r.date)+"</td>"+
-      "<td>"+safe(r.time)+"</td>"+
-      "<td>"+attendanceBadge(r.type||"P")+"</td>"+
-      "<td>"+rh.toFixed(2)+"</td>"+
-      "<td>₹"+(rh*(e.wage/8)).toFixed(2)+"</td>"+
-      "<td>"+safe(r.markedBy)+"</td>"+
-      "<td>"+statusBadge(r.status)+"</td>";
-    tbody.appendChild(row);
-  });
+async function renderEmployeeData(recordsOverride=null){
+  const id=sessionStorage.getItem("employeeId");const e=await getEmployee(id);if(!e)return;const mine=recordsOverride?recordsOverride.filter(r=>r.employeeEmail===e.email):await getRecords();const approved=mine.filter(r=>r.status==="Approved");const pending=mine.filter(r=>r.status==="Pending");const full=approved.filter(r=>(r.type||"P")==="P").length;const half=approved.filter(r=>r.type==="H").length;const ot=approved.reduce((s,r)=>s+(Number(r.otHours)||0),0);const otWage=ot*(e.wage/8);const monthly=full*e.wage+half*e.wage/2+otWage;document.getElementById("fullDays").textContent=full;document.getElementById("halfDays").textContent=half;document.getElementById("pendingDays").textContent=pending.length;document.getElementById("empOTHours").textContent=ot.toFixed(2);document.getElementById("empOTWage").textContent="₹"+otWage.toFixed(2);document.getElementById("empMonthlyWage").textContent="₹"+monthly.toFixed(2);const tbody=document.getElementById("employeeHistory");tbody.innerHTML="";if(!mine.length){tbody.innerHTML='<tr><td colspan="7">No attendance records yet.</td></tr>';return;}mine.slice().reverse().forEach(r=>{const row=document.createElement("tr");const rh=Number(r.otHours)||0;row.innerHTML="<td>"+safe(r.date)+"</td><td>"+safe(r.time)+"</td><td>"+attendanceBadge(r.type||"P")+"</td><td>"+rh.toFixed(2)+"</td><td>₹"+(rh*(e.wage/8)).toFixed(2)+"</td><td>"+safe(r.markedBy)+"</td><td>"+statusBadge(r.status)+"</td>";tbody.appendChild(row);});
 }
 
 async function showAdminDashboard(){
-  document.getElementById("loginScreen").style.display="none";
-  document.getElementById("employeeDashboard").style.display="none";
-  document.getElementById("adminDashboard").style.display="block";
-  setAdminDate();
-  fillEmployeeSelect();
-  await renderAdmin();
-  updateLastUpdated();
+  document.getElementById("loginScreen").style.display="none";document.getElementById("employeeDashboard").style.display="none";document.getElementById("adminDashboard").style.display="block";setAdminDate();await loadEmployees();fillEmployeeSelect();await renderEmployeeManagement();await renderAdmin();startAttendanceListener();updateLastUpdated();
 }
 
 async function adminMarkAttendance(){
-  const id=document.getElementById("adminEmployee").value;
-  const dateInput=document.getElementById("adminDate").value;
-  const type=document.getElementById("adminAttendanceType").value;
-  const ot=Number(document.getElementById("adminOTHours").value)||0;
+  const id=document.getElementById("adminEmployee").value;const dateInput=document.getElementById("adminDate").value;const type=document.getElementById("adminAttendanceType").value;const ot=Number(document.getElementById("adminOTHours").value)||0;if(!dateInput){showMessage("adminMarkMessage","Please select a date.","error");return;}const e=employees.find(x=>x.id===id);if(!e){showMessage("adminMarkMessage","Employee not found.","error");return;}try{const records=await getRecords();const date=convertInputDate(dateInput);if(records.some(r=>r.employeeId===id&&r.date===date)){showMessage("adminMarkMessage","Attendance already exists for this employee on this date.","error");return;}await addRecord({employeeId:e.id,employeeName:e.name,employeeEmail:e.email,date,time:new Date().toLocaleTimeString("en-IN"),type,otHours:ot,markedBy:"Admin",status:"Approved"});localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());showMessage("adminMarkMessage","Attendance marked by Admin successfully.","success");await renderAdmin();updateLastUpdated();}catch(error){console.error(error);showMessage("adminMarkMessage","Admin attendance could not be saved to Firebase.","error");}
+}
 
-  if(!dateInput){
-    showMessage("adminMarkMessage","Please select a date.","error");
-    return;
-  }
+async function renderAdmin(recordsOverride=null){const records=recordsOverride||await getRecords();document.getElementById("totalRequests").textContent=records.length;document.getElementById("totalPending").textContent=records.filter(r=>r.status==="Pending").length;document.getElementById("totalApproved").textContent=records.filter(r=>r.status==="Approved").length;document.getElementById("totalRejected").textContent=records.filter(r=>r.status==="Rejected").length;renderAdminTable(records);renderSummary(records);}
+function renderAdminTable(records){const tbody=document.getElementById("adminTable");tbody.innerHTML="";if(!records.length){tbody.innerHTML='<tr><td colspan="8">No attendance records.</td></tr>';return;}records.slice().reverse().forEach(r=>{const row=document.createElement("tr");let action="";if(r.status==="Pending"){action+='<button class="approveBtn" type="button" data-action="approve" data-id="'+safe(r.id)+'">APPROVE</button><button class="rejectBtn" type="button" data-action="reject" data-id="'+safe(r.id)+'">REJECT</button>';}action+='<button class="removeBtn" type="button" data-action="remove" data-id="'+safe(r.id)+'">REMOVE</button>';row.innerHTML="<td>"+safe(r.employeeId)+"</td><td>"+safe(r.employeeName)+"</td><td>"+safe(r.date)+"</td><td>"+attendanceBadge(r.type||"P")+"</td><td>"+(Number(r.otHours)||0).toFixed(2)+"</td><td>"+safe(r.markedBy)+"</td><td>"+statusBadge(r.status)+"</td><td>"+action+"</td>";tbody.appendChild(row);});}
+function renderSummary(records){const tbody=document.getElementById("employeeSummary");tbody.innerHTML="";employees.forEach(e=>{const approved=records.filter(r=>r.employeeId===e.id&&r.status==="Approved");const full=approved.filter(r=>(r.type||"P")==="P").length;const half=approved.filter(r=>r.type==="H").length;const ot=approved.reduce((s,r)=>s+(Number(r.otHours)||0),0);const otWage=ot*(e.wage/8);const monthly=full*e.wage+half*e.wage/2+otWage;const row=document.createElement("tr");row.innerHTML="<td>"+safe(e.id)+"</td><td>"+safe(e.name)+"</td><td>₹"+e.wage+"</td><td>"+full+"</td><td>"+half+"</td><td>"+ot.toFixed(2)+"</td><td>₹"+otWage.toFixed(2)+"</td><td><b>₹"+monthly.toFixed(2)+"</b></td>";tbody.appendChild(row);});}
 
-  if(ot<0){
-    showMessage("adminMarkMessage","OT hours cannot be negative.","error");
-    return;
-  }
+async function updateStatus(id,status){try{await saveRecordStatus(id,status);localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());updateLastUpdated();}catch(error){console.error(error);showMessage("adminMarkMessage","Could not update attendance status in Firebase.","error");}}
+async function removeAttendance(id){if(!confirm("Are you sure you want to REMOVE this attendance record?"))return;try{await removeRecord(id);localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());updateLastUpdated();}catch(error){console.error(error);showMessage("adminMarkMessage","Could not remove attendance record from Firebase.","error");}}
 
+async function renderEmployeeManagement(){
+  const tbody=document.getElementById("employeeManagementTable");tbody.innerHTML="";
+  employees.forEach(e=>{const row=document.createElement("tr");const action=e.active
+?'<button class="removeBtn" type="button" data-emp-action="deactivate" data-emp-id="'+safe(e.id)+'">DEACTIVATE</button> <button class="rejectBtn" type="button" data-emp-action="delete" data-emp-id="'+safe(e.id)+'">DELETE</button>'
+:'<button class="activateBtn" type="button" data-emp-action="activate" data-emp-id="'+safe(e.id)+'">ACTIVATE</button> <button class="rejectBtn" type="button" data-emp-action="delete" data-emp-id="'+safe(e.id)+'">DELETE</button>';row.innerHTML="<td>"+safe(e.id)+"</td><td>"+safe(e.name)+"</td><td>₹"+e.wage+"</td><td>"+safe(e.email)+"</td><td>"+(e.active?'<span class="badge approved">ACTIVE</span>':'<span class="badge rejected">INACTIVE</span>')+"</td><td>"+action+"</td>";tbody.appendChild(row);});
+}
+
+async function addEmployee(){
+  clearMessage("employeeManageMessage");
+  const id=document.getElementById("newEmpId").value.trim().toUpperCase();const name=document.getElementById("newEmpName").value.trim().toUpperCase();const wage=Number(document.getElementById("newEmpWage").value);const password=document.getElementById("newEmpPassword").value;
+  if(!/^EMP\d+$/.test(id)){showMessage("employeeManageMessage","Employee ID must look like EMP017.","error");return;}
+  if(!name||!wage||wage<0){showMessage("employeeManageMessage","Enter Name and valid wage.","error");return;}
+  if(password.length<6){showMessage("employeeManageMessage","Password must be at least 6 characters.","error");return;}
+  if(employees.some(e=>e.id===id)){showMessage("employeeManageMessage","This Employee ID already exists.","error");return;}
+  const email=employeeEmail(id);
+  try{
+    await window.firebaseFns.createUserWithEmailAndPassword(window.firebaseFns.creatorAuth,email,password);
+    await window.firebaseFns.signOut(window.firebaseFns.creatorAuth);
+    await window.firebaseFns.setDoc(window.firebaseFns.doc(window.firebaseDB,EMP_COLLECTION,id),{id,name,wage,email,active:true,createdAt:window.firebaseFns.serverTimestamp()});
+    employees.push({id,name,wage,email,active:true});employees.sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
+    fillEmployeeSelect();await renderEmployeeManagement();await renderSummary(await getRecords());
+    document.getElementById("newEmpId").value="";document.getElementById("newEmpName").value="";document.getElementById("newEmpWage").value="";document.getElementById("newEmpPassword").value="";
+    showMessage("employeeManageMessage",id+" added successfully. Login email: "+email,"success");
+  }catch(error){console.error(error);let msg="Could not create employee.";if(error.code==="auth/email-already-in-use")msg="This login email already exists in Firebase Authentication.";if(error.code==="auth/invalid-email")msg="Generated employee email is invalid.";showMessage("employeeManageMessage",msg,"error");}
+}
+
+async function setEmployeeActive(id,active){try{await window.firebaseFns.updateDoc(window.firebaseFns.doc(window.firebaseDB,EMP_COLLECTION,id),{active});employees=employees.map(e=>e.id===id?{...e,active}:e);fillEmployeeSelect();await renderEmployeeManagement();showMessage("employeeManageMessage",id+(active?" activated.":" deactivated."),"success");}catch(error){console.error(error);showMessage("employeeManageMessage","Could not update employee status.","error");}}
+
+async function deleteEmployeeCompletely(id){
   const e=employees.find(x=>x.id===id);
   if(!e)return;
-
+  if(!confirm("DELETE "+e.id+" - "+e.name+" completely?\n\nThis removes the employee from the dashboard, Firestore profile and all attendance records.\nThe Firebase Authentication login account must be deleted separately from Firebase Console."))return;
   try{
-    const records=await getRecords();
-
-    if(records.some(r=>r.employeeId===id && r.date===convertInputDate(dateInput))){
-      showMessage("adminMarkMessage","Attendance already exists for this employee on this date.","error");
-      return;
-    }
-
-    await addRecord({
-      employeeId:e.id,
-      employeeName:e.name,
-      employeeEmail:employeeEmail(e.id),
-      date:convertInputDate(dateInput),
-      time:new Date().toLocaleTimeString("en-IN"),
-      type:type,
-      otHours:ot,
-      markedBy:"Admin",
-      status:"Approved"
-    });
-
-    localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());
-    showMessage("adminMarkMessage","Attendance marked by Admin successfully.","success");
+    const {doc,deleteDoc,collection,getDocs,query,where}=window.firebaseFns;
+    await deleteDoc(doc(window.firebaseDB,EMP_COLLECTION,id));
+    const snap=await getDocs(query(collection(window.firebaseDB,"attendance"),where("employeeId","==",id)));
+    for(const d of snap.docs) await deleteDoc(doc(window.firebaseDB,"attendance",d.id));
+    employees=employees.filter(x=>x.id!==id);
+    fillEmployeeSelect();
+    await renderEmployeeManagement();
     await renderAdmin();
-    updateLastUpdated();
-
+    showMessage("employeeManageMessage",e.id+" - "+e.name+" removed from dashboard and Firestore.","success");
   }catch(error){
     console.error(error);
-    showMessage("adminMarkMessage","Admin attendance could not be saved to Firebase.","error");
+    showMessage("employeeManageMessage","Employee could not be deleted. Check Firestore Rules.","error");
   }
 }
 
-async function renderAdmin(){
-  const records=await getRecords();
+async function logout(){stopAttendanceListener();try{if(window.firebaseAuth&&window.firebaseAuth.currentUser)await window.firebaseFns.signOut(window.firebaseAuth);}catch(error){console.error(error);}sessionStorage.clear();document.getElementById("employeeDashboard").style.display="none";document.getElementById("adminDashboard").style.display="none";document.getElementById("loginScreen").style.display="flex";document.getElementById("employeeId").value="";document.getElementById("employeePassword").value="";document.getElementById("adminUsername").value="";document.getElementById("adminPassword").value="";clearMessage("loginMessage");}
 
-  document.getElementById("totalRequests").textContent=records.length;
-  document.getElementById("totalPending").textContent=records.filter(r=>r.status==="Pending").length;
-  document.getElementById("totalApproved").textContent=records.filter(r=>r.status==="Approved").length;
-  document.getElementById("totalRejected").textContent=records.filter(r=>r.status==="Rejected").length;
-
-  renderAdminTable(records);
-  renderSummary(records);
-}
-
-function renderAdminTable(records){
-  const tbody=document.getElementById("adminTable");
-  tbody.innerHTML="";
-
-  if(!records.length){
-    tbody.innerHTML='<tr><td colspan="8">No attendance records.</td></tr>';
-    return;
-  }
-
-  records.slice().reverse().forEach(r=>{
-    const row=document.createElement("tr");
-    let action="";
-
-    if(r.status==="Pending"){
-      action+='<button class="approveBtn" type="button" data-action="approve" data-id="'+safe(r.id)+'">APPROVE</button>';
-      action+='<button class="rejectBtn" type="button" data-action="reject" data-id="'+safe(r.id)+'">REJECT</button>';
-    }
-
-    action+='<button class="removeBtn" type="button" data-action="remove" data-id="'+safe(r.id)+'">REMOVE</button>';
-
-    row.innerHTML=
-      "<td>"+safe(r.employeeId)+"</td>"+
-      "<td>"+safe(r.employeeName)+"</td>"+
-      "<td>"+safe(r.date)+"</td>"+
-      "<td>"+attendanceBadge(r.type||"P")+"</td>"+
-      "<td>"+(Number(r.otHours)||0).toFixed(2)+"</td>"+
-      "<td>"+safe(r.markedBy)+"</td>"+
-      "<td>"+statusBadge(r.status)+"</td>"+
-      "<td>"+action+"</td>";
-
-    tbody.appendChild(row);
-  });
-}
-
-function renderSummary(records){
-  const tbody=document.getElementById("employeeSummary");
-  tbody.innerHTML="";
-
-  employees.forEach(e=>{
-    const approved=records.filter(r=>r.employeeId===e.id && r.status==="Approved");
-    const full=approved.filter(r=>(r.type||"P")==="P").length;
-    const half=approved.filter(r=>r.type==="H").length;
-    const ot=approved.reduce((s,r)=>s+(Number(r.otHours)||0),0);
-    const otWage=ot*(e.wage/8);
-    const monthly=full*e.wage+half*e.wage/2+otWage;
-
-    const row=document.createElement("tr");
-    row.innerHTML=
-      "<td>"+safe(e.id)+"</td>"+
-      "<td>"+safe(e.name)+"</td>"+
-      "<td>₹"+e.wage+"</td>"+
-      "<td>"+full+"</td>"+
-      "<td>"+half+"</td>"+
-      "<td>"+ot.toFixed(2)+"</td>"+
-      "<td>₹"+otWage.toFixed(2)+"</td>"+
-      "<td><b>₹"+monthly.toFixed(2)+"</b></td>";
-    tbody.appendChild(row);
-  });
-}
-
-async function updateStatus(id,status){
-  try{
-    await saveRecordStatus(id,status);
-    localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());
-    await renderAdmin();
-    updateLastUpdated();
-  }catch(error){
-    console.error(error);
-    showMessage("adminMarkMessage","Could not update attendance status in Firebase.","error");
-  }
-}
-
-async function removeAttendance(id){
-  if(!confirm("Are you sure you want to REMOVE this attendance record?"))return;
-
-  try{
-    await removeRecord(id);
-    localStorage.setItem(LAST_UPDATED_KEY,new Date().toISOString());
-    await renderAdmin();
-    updateLastUpdated();
-  }catch(error){
-    console.error(error);
-    showMessage("adminMarkMessage","Could not remove attendance record from Firebase.","error");
-  }
-}
-
-async function logout(){
-  try{
-    if(window.firebaseAuth && window.firebaseAuth.currentUser){
-      await window.firebaseFns.signOut(window.firebaseAuth);
-    }
-  }catch(error){
-    console.error(error);
-  }
-
-  sessionStorage.clear();
-  document.getElementById("employeeDashboard").style.display="none";
-  document.getElementById("adminDashboard").style.display="none";
-  document.getElementById("loginScreen").style.display="flex";
-  document.getElementById("employeeId").value="";
-  document.getElementById("employeePassword").value="";
-  document.getElementById("adminUsername").value="";
-  document.getElementById("adminPassword").value="";
-  clearMessage("loginMessage");
-}
-
-document.getElementById("loginType").addEventListener("change",function(){
-  document.getElementById("employeeLogin").style.display=this.value==="employee"?"block":"none";
-  document.getElementById("adminLogin").style.display=this.value==="admin"?"block":"none";
-});
-
-document.getElementById("loginBtn").addEventListener("click",login);
-document.getElementById("employeeLogout").addEventListener("click",logout);
-document.getElementById("adminLogout").addEventListener("click",logout);
-document.getElementById("markAttendanceBtn").addEventListener("click",markAttendance);
-document.getElementById("adminMarkBtn").addEventListener("click",adminMarkAttendance);
-
-document.getElementById("employeeAttendanceType").addEventListener("change",updateEmployeeWagePreview);
-document.getElementById("employeeOTHours").addEventListener("input",updateEmployeeWagePreview);
-
-document.getElementById("adminTable").addEventListener("click",async function(e){
-  const btn=e.target.closest("button");
-  if(!btn)return;
-  const id=btn.getAttribute("data-id");
-  const action=btn.getAttribute("data-action");
-
-  if(action==="approve")await updateStatus(id,"Approved");
-  if(action==="reject")await updateStatus(id,"Rejected");
-  if(action==="remove")await removeAttendance(id);
-});
-
-["employeeId","employeePassword","adminUsername","adminPassword"].forEach(id=>{
-  document.getElementById(id).addEventListener("keydown",function(e){
-    if(e.key==="Enter")login();
-  });
-});
-
-updateVisitorCount();
-updateClock();
-updateLastUpdated();
-setInterval(updateClock,1000);
-
-// Do not restore a previous session automatically until Firebase is ready.
-// If the browser still has a session, Firebase keeps the authentication session.
-setTimeout(async ()=>{
-  const role=sessionStorage.getItem("loginRole");
-  if(!role || !window.firebaseAuth || !window.firebaseAuth.currentUser)return;
-
-  if(role==="employee")await showEmployeeDashboard();
-  if(role==="admin")await showAdminDashboard();
-},500);
-
+document.getElementById("loginType").addEventListener("change",function(){document.getElementById("employeeLogin").style.display=this.value==="employee"?"block":"none";document.getElementById("adminLogin").style.display=this.value==="admin"?"block":"none";});
+document.getElementById("loginBtn").addEventListener("click",login);document.getElementById("employeeLogout").addEventListener("click",logout);document.getElementById("adminLogout").addEventListener("click",logout);document.getElementById("markAttendanceBtn").addEventListener("click",markAttendance);document.getElementById("adminMarkBtn").addEventListener("click",adminMarkAttendance);document.getElementById("addEmployeeBtn").addEventListener("click",addEmployee);document.getElementById("employeeAttendanceType").addEventListener("change",updateEmployeeWagePreview);document.getElementById("employeeOTHours").addEventListener("input",updateEmployeeWagePreview);
+document.getElementById("adminTable").addEventListener("click",async function(e){const btn=e.target.closest("button");if(!btn)return;const id=btn.getAttribute("data-id");const action=btn.getAttribute("data-action");if(action==="approve")await updateStatus(id,"Approved");if(action==="reject")await updateStatus(id,"Rejected");if(action==="remove")await removeAttendance(id);});
+document.getElementById("employeeManagementTable").addEventListener("click",async function(e){const btn=e.target.closest("button");if(!btn)return;const id=btn.getAttribute("data-emp-id");const action=btn.getAttribute("data-emp-action");if(action==="deactivate"){if(confirm("Deactivate "+id+"? Existing attendance will remain safe."))await setEmployeeActive(id,false);}if(action==="activate")await setEmployeeActive(id,true);if(action==="delete")await deleteEmployeeCompletely(id);});
+["employeeId","employeePassword","adminUsername","adminPassword"].forEach(id=>document.getElementById(id).addEventListener("keydown",function(e){if(e.key==="Enter")login();}));
+updateVisitorCount();updateClock();updateLastUpdated();setInterval(updateClock,1000);
+setTimeout(async()=>{const role=sessionStorage.getItem("loginRole");if(!role||!window.firebaseAuth||!window.firebaseAuth.currentUser)return;if(role==="employee")await showEmployeeDashboard();if(role==="admin")await showAdminDashboard();},500);
 });
 </script>
 </body>

@@ -60,9 +60,30 @@ th{background:#f3f6fa;white-space:nowrap}
 .logo{font-size:20px}
 }
 </style>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBAI8sCtxQhlu7AWPL0I2P3SDfpftOCmEE",
+    authDomain: "employeelogin-a10cb.firebaseapp.com",
+    projectId: "employeelogin-a10cb",
+    storageBucket: "employeelogin-a10cb.firebasestorage.app",
+    messagingSenderId: "324749669563",
+    appId: "1:324749669563:web:9731c1498922e79a22659e",
+    measurementId: "G-XGTJ6F0GXH"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.firebaseAuth = auth;
+  window.firebaseDB = db;
+  </script>
 </head>
 <body>
-
 <div class="header">
 <div class="logo">📋 Employee Attendance System</div>
 <p>Employee Attendance & Admin Approval</p>
